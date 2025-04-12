@@ -36,6 +36,6 @@ function createWindow () {
   })
 
   // and load the index.html of the app.
-  win.loadFile('scummy.html')
+  win.loadFile('sage.html')
 }
 app.whenReady().then(createWindow)

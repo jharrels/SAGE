@@ -925,7 +925,24 @@ function drawCategories() {
     installedCategories[key] = 0;
   });
   Object.keys(installed).forEach(key => {
-    installedCategories[gameData[key]['category']] += 1;
+    let [engineName, gameName] = key.split(":");
+    let tempCategory = "other";
+    if ((engineName == "cine") || (engineName == "cruise")) tempCategory = "delphine";
+    if (engineName == "wintermute") tempCategory = "wintermute";
+    if (engineName == "ultima") tempCategory = "origin";
+    if (engineName == "glk") tempCategory = "if";
+    if (engineName == "gob") tempCategory = "coktel";
+    if (engineName == "sci") tempCategory = "sierra";
+    if (engineName == "bladerunner") tempCategory = "westwood";
+    if (engineName == "sword1") tempCategory = "revolution";
+    if (engineName == "sword2") tempCategory = "revolution";
+    if (engineName == "agi") tempCategory = "fan";
+    if (engineName == "mohawk") tempCategory = "living";
+    if (engineName == "composer") tempCategory = "magic";
+    if (engineName == "access") tempCategory = "access";
+    if (engineName == "scumm") tempCategory = "humongous";
+//if ((engineName == "scumm") && ((installed[key]["version"].includes("Indiana")) || (installed[key]["version"].includes("McKracken")))) tempCategory = "lucasarts";
+    installedCategories[tempCategory] += 1;
   });
   Object.keys(categories).sort().forEach(key => {
     if (installedCategories[key] > 0) {
@@ -1101,7 +1118,7 @@ function getInstalledGames() {
     scummvmPath = scummyConfig['scummvmPath']+"/Contents/MacOS";
     scummvmFile = "./scummvm";
   }
-  let scummvm = spawn(scummvmFile, ['--list-targets'], {'cwd': scummvmPath, 'shell': true});
+  let scummvm = spawn(scummvmFile, ['--list-games'], {'cwd': scummvmPath, 'shell': true});
 
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
@@ -1117,32 +1134,13 @@ function getInstalledGames() {
       let parsedData = rawDataList[i].match(/(.+?)[ ]{1,}(.+)$/);
       let rawGameId = parsedData[1];
       let parsedGameName;
-      if (parsedData[2].includes("(")) {
-        parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
-      } else {
-        parsedGameName = ["", parsedData[2], "Default"];
-      }
-      let rawGameIdList = rawGameId.split("-");
-      let numPieces = rawGameIdList.length
-      let found = false;
-      while ((!found) && (numPieces > 0)) {
-        let testId = rawGameIdList.slice(0,numPieces).join("-");
-        if (testId in gameData) {
-          found = true;
-          if (testId in installed) {
-            installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
-          } else {
-            let longName = parsedGameName[1].trim();
-            let firstLetter = longName.charAt(0).toUpperCase();
-            longName = firstLetter + longName.slice(1);
-            if (longName.substr(0, 4) == "The ") longName = longName.substr(4) + ", The";
-            installed[testId] = {"name": longName, "versions": []};
-            installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
-          }
-        } else {
-          numPieces--;
-        }
-      }
+      parsedGameName = ["", parsedData[2], "Default"];
+      let longName = parsedGameName[1].trim();
+      let firstLetter = longName.charAt(0).toUpperCase();
+      longName = firstLetter + longName.slice(1);
+      if (longName.substr(0, 4) == "The ") longName = longName.substr(4) + ", The";     
+      installed[rawGameId] = {"name": longName, "versions": []}
+      installed[rawGameId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
     }
     updateDefaultVersions();
     drawCategories();
