@@ -18,6 +18,7 @@ var scummvmConfig = {};
 var scummyConfig = {};
 var tempConfig = {};
 var installed;
+var fullList;
 var selectedGame = "";
 var selectedConfig = "";
 var importGamePath = "";
@@ -1128,7 +1129,7 @@ function getInstalledGames() {
   });
 
   scummvm.on('exit', (code) => {
-    rawDataList = rawData.split("\r\n");
+    alert(rawData);
     if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
     for (i=2; i<rawDataList.length-1; i++) {
       let parsedData = rawDataList[i].match(/(.+?)[ ]{1,}(.+)$/);
