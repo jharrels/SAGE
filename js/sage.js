@@ -18,91 +18,11 @@ var scummvmConfig = {};
 var scummyConfig = {};
 var tempConfig = {};
 var installed;
-var fullList;
 var selectedGame = "";
 var selectedConfig = "";
 var importGamePath = "";
 var audioDevices = [];
 
-const template = [
-   {
-      label: 'Edit',
-      submenu: [
-         {
-            role: 'undo'
-         },
-         {
-            role: 'redo'
-         },
-         {
-            type: 'separator'
-         },
-         {
-            role: 'cut'
-         },
-         {
-            role: 'copy'
-         },
-         {
-            role: 'paste'
-         }
-      ]
-   },
-
-   {
-      label: 'View',
-      submenu: [
-         {
-            role: 'reload'
-         },
-         {
-            role: 'toggledevtools'
-         },
-         {
-            type: 'separator'
-         },
-         {
-            role: 'resetzoom'
-         },
-         {
-            role: 'zoomin'
-         },
-         {
-            role: 'zoomout'
-         },
-         {
-            type: 'separator'
-         },
-         {
-            role: 'togglefullscreen'
-         }
-      ]
-   },
-
-   {
-      role: 'window',
-      submenu: [
-         {
-            role: 'minimize'
-         },
-         {
-            role: 'close'
-         }
-      ]
-   },
-
-   {
-      role: 'help',
-      submenu: [
-         {
-            label: 'Learn More'
-         }
-      ]
-   }
-]
-
-const menu = Menu.buildFromTemplate(template)
-Menu.setApplicationMenu(menu);
 //Menu.setApplicationMenu(null);
 
 let titlebar = new customTitlebar.Titlebar({
@@ -116,8 +36,6 @@ let titlebar = new customTitlebar.Titlebar({
 ---------------------------------------------------------------------------- */
 var listMode = store.get('listMode');
 if (listMode === undefined) listMode = "gallery";
-var groupItems = store.get('groupItems');
-if (groupItems === undefined) groupItems = false;
 var favorites = store.get('favorites');
 if (favorites === undefined) favorites = [];
 var defaultVersion = store.get('defaultVersion');
@@ -130,7 +48,6 @@ var scummyConfig = store.get('scummyConfig');
 if (scummyConfig === undefined) scummyConfig = {};
 
 $(`#${listMode}-view`).addClass("active");
-if (groupItems) $("#group-items").addClass("active");
 
 parseScummyConfig();
 checkInitState();
@@ -321,20 +238,6 @@ $("#gallery-view").on("click", () => {
   }
 });
 
-$("#group-items").on("click", () => {
-  if (!$("#group-items").hasClass("active")) {
-    $("#group-items").addClass("active");
-    groupItems = true;
-    store.set('groupItems', groupItems);
-    drawGames();
-  } else {
-    $("#group-items").removeClass("active");
-    groupItems = false;
-    store.set('groupItems', groupItems);
-    drawGames();
-  }
-});
-
 $("#list-view").on("click", () => {
   if (!$("list-view").hasClass("active")) {
     $("#gallery-view").removeClass("active");
@@ -366,7 +269,7 @@ $(".launch-config").on("click", ".play", function(e) {
 
 $(".launch-config").on("click", ".remove", function(e) {
   let category = gameData[selectedGame]['category'];
-  let imagePath = __dirname+`/${category}/${selectedGame}.jpg`;
+  let imagePath = __dirname+`/boxart/${category}/${selectedGame}.jpg`;
   try {
     fs.accessSync(imagePath, fs.constants.R_OK);
   } catch(err) {
@@ -522,9 +425,7 @@ $(".main").on("contextmenu", ".game", function(e) {
     $("#context-menu").find(".favorite").html("<i class='fas fa-heart fa-fw'></i> Favorite").removeClass("active");
   }
   $("#context-menu").children(".manage").attr("id", gameId);
-  let menuLeft = e.pageX-50;
-  if (menuLeft + $("#context-menu").width() > $("body").width()) menuLeft = $("body").width() - $("#context-menu").width() - 20;
-  $("#context-menu").css({left: menuLeft, top: e.pageY-50}).fadeIn(250);
+  $("#context-menu").css({left: e.pageX-50, top: e.pageY-50}).fadeIn(250);
 });
 
 $("#context-menu").on("mouseleave", () => {
@@ -744,13 +645,6 @@ function volumeOverridden(gameShortName) {
 }
 
 function launchGame(gameId, shortName) {
-  if ($(`#${gameId}`).hasClass("disabled")) {
-    alertObj = $("<i></i>", {"class": "fas fa-exclamation-triangle warning-color fa-3x"});
-    $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(alertObj);
-    $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html("Data for this game is missing!");
-    showModal("#unknown-modal");
-    return;
-  }
   let lastPosition = recentList.indexOf(gameId);
   if (lastPosition > -1) recentList.splice(lastPosition, 1);
   recentList.unshift(gameId);
@@ -926,24 +820,7 @@ function drawCategories() {
     installedCategories[key] = 0;
   });
   Object.keys(installed).forEach(key => {
-    let [engineName, gameName] = key.split(":");
-    let tempCategory = "other";
-    if ((engineName == "cine") || (engineName == "cruise")) tempCategory = "delphine";
-    if (engineName == "wintermute") tempCategory = "wintermute";
-    if (engineName == "ultima") tempCategory = "origin";
-    if (engineName == "glk") tempCategory = "if";
-    if (engineName == "gob") tempCategory = "coktel";
-    if (engineName == "sci") tempCategory = "sierra";
-    if (engineName == "bladerunner") tempCategory = "westwood";
-    if (engineName == "sword1") tempCategory = "revolution";
-    if (engineName == "sword2") tempCategory = "revolution";
-    if (engineName == "agi") tempCategory = "fan";
-    if (engineName == "mohawk") tempCategory = "living";
-    if (engineName == "composer") tempCategory = "magic";
-    if (engineName == "access") tempCategory = "access";
-    if (engineName == "scumm") tempCategory = "humongous";
-//if ((engineName == "scumm") && ((installed[key]["version"].includes("Indiana")) || (installed[key]["version"].includes("McKracken")))) tempCategory = "lucasarts";
-    installedCategories[tempCategory] += 1;
+    installedCategories[gameData[key]['category']] += 1;
   });
   Object.keys(categories).sort().forEach(key => {
     if (installedCategories[key] > 0) {
@@ -963,7 +840,7 @@ function drawCategories() {
 function drawGameInfo(gameId) {
   selectedGame = gameId;
   let category = gameData[gameId]['category'];
-  let imagePath = __dirname+`/boxart/${gameId}.jpg`;
+  let imagePath = __dirname+`/boxart/${category}/${gameId}.jpg`;
   try {
     fs.accessSync(imagePath, fs.constants.R_OK);
   } catch(err) {
@@ -1011,9 +888,8 @@ function drawGameInfo(gameId) {
 }
 
 function drawGames() {
-  $(".grid").remove();
-  $(".list").remove();
-  $(".group-header").remove();
+  $("#grid").remove();
+  $("#list").remove();
   let longNames = {};
   if (selectedCategory == "recent") {
     recentList.forEach(key => {
@@ -1021,93 +897,69 @@ function drawGames() {
         longNames[installed[key]['name']] = key;
       }
     });
-    drawGrid(longNames);
   }
   if (selectedCategory == "all") {
-    if (groupItems) {
-      Object.keys(categories).forEach(key => {
-        longNames = {};
-        Object.keys(installed).forEach(installKey => {
-          if (gameData[installKey]['category'] == key) longNames[installed[installKey]['name']] = installKey;
-        });
-        if (Object.keys(longNames).length > 0) drawGrid(longNames, key);
-      });
-    } else {
-      Object.keys(installed).forEach(key => {
-        longNames[installed[key]['name']] = key;
-      });
-      drawGrid(longNames);
-    }
+    Object.keys(installed).forEach(key => {
+      longNames[installed[key]['name']] = key;
+    });
   }
   if (selectedCategory == "favorites") {
-    if (groupItems) {
-      Object.keys(categories).forEach(key => {
-        longNames = {};
-        favorites.forEach(favoriteKey => {
-          if (gameData[favoriteKey]['category'] == key) longNames[installed[favoriteKey]['name']] = favoriteKey;
-        });
-        if (Object.keys(longNames).length > 0) drawGrid(longNames, key);
-      });
-    } else {
-      favorites.forEach(key => {
-        longNames[installed[key]['name']] = key;
-      });
-      drawGrid(longNames);
-    }
+    favorites.forEach(key => {
+      longNames[installed[key]['name']] = key;
+    });
   }
   if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
     Object.keys(installed).forEach(key => {
       if (selectedCategory == gameData[key]['category']) longNames[installed[key]['name']] = key;
     });
-    if (groupItems) {
-      drawGrid(longNames, selectedCategory);
-    } else {
-      drawGrid(longNames);
-    }
-  }
-}
-
-function drawGrid(longNames, categoryId) {
-  if (typeof categoryId === "string") {
-    let groupHeader = $("<div></div>", {"class": "group-header"})
-      .html(categories[categoryId]);
-    $(".main").append(groupHeader);
-  if ($(".group-header").length == 1) $(".group-header").addClass("first");
   }
   let tempGameList = Object.keys(longNames);
-  console.log(tempGameList);
   if (selectedCategory != "recent") tempGameList = Object.keys(longNames).sort();
-  let gridClass;
-  if (listMode == "gallery") gridClass = "grid";
-  if (listMode == "list") gridClass = "list";
-  let gridNumber = gridClass+$(`.${gridClass}`).length + 1;
-  let grid = $("<div></div>", {"class": `${gridClass} ${gridNumber}`});
-  $(".main").append(grid);
-  tempGameList.forEach(key => {
-    let category = gameData[longNames[key]]['category'];
-    let imagePath = __dirname+`/boxart/${longNames[key]}.jpg`;
-    try {
-      fs.accessSync(imagePath, fs.constants.R_OK);
-    } catch(err) {
-      console.log(`Missing: boxart/${longNames[key]}.jpg`);
-       imagePath = "boxart/missing.jpg";
-    }
-    let gameImageObj = $("<img></img", {"src": imagePath});
-    let favoriteObj = "";
-    if (scummyConfig['showFavoriteIcon']) {
-      if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
-    }
-    let gameNameObj;
-    if (scummyConfig['showTitles']) gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
-    let sdefault = defaultVersion[longNames[key]];
-    let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
-    $(`.${gridNumber}`).append(rowObj);
-    try {
-      fs.accessSync(scummvmConfig[sdefault]['path'], fs.constants.R_OK);
-    } catch(err) {
-      $(`#${longNames[key]}`).addClass("disabled");
-    }
-  });
+  if (listMode == "gallery") {
+    let grid = $("<div></div>", {"id": "grid"});
+    $(".main").html("").append(grid);
+    tempGameList.forEach(key => {
+      let category = gameData[longNames[key]]['category'];
+      let imagePath = __dirname+`/boxart/${category}/${longNames[key]}.jpg`;
+      try {
+        fs.accessSync(imagePath, fs.constants.R_OK);
+      } catch(err) {
+        console.log(`Missing: boxart/${category}/${longNames[key]}.jpg`);
+         imagePath = "boxart/missing.jpg";
+      }
+      let gameImageObj = $("<img></img", {"src": imagePath});
+      let favoriteObj = "";
+      if (scummyConfig['showFavoriteIcon']) {
+        if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
+      }
+      let gameNameObj;
+      if (scummyConfig['showTitles']) gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
+      let sdefault = defaultVersion[longNames[key]];
+      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
+      $("#grid").append(rowObj);
+    });
+  }
+  if (listMode == "list") {
+    let list = $("<div></div>", {"id": "list"});
+    $(".main").html("").append(list);
+    tempGameList.forEach(key => {
+      let category = gameData[longNames[key]]['category'];
+      let imagePath = __dirname+`/boxart/${category}/${longNames[key]}.jpg`;
+      try {
+        fs.accessSync(imagePath, fs.constants.R_OK);
+      } catch(err) {
+         imagePath = "boxart/missing.jpg";
+      }
+      let gameImageObj = $("<img></img", {"src": imagePath});
+      let favoriteObj = "";
+      if (scummyConfig['showFavoriteIcon']) {
+        if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
+      }
+      let gameNameObj = $("<span></span>").text(key).prepend(favoriteObj);
+      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": defaultVersion[key]}).append(gameImageObj).append(gameNameObj);
+      $("#list").append(rowObj);
+    });
+  }
 }
 
 function getInstalledGames() {
@@ -1119,7 +971,7 @@ function getInstalledGames() {
     scummvmPath = scummyConfig['scummvmPath']+"/Contents/MacOS";
     scummvmFile = "./scummvm";
   }
-  let scummvm = spawn(scummvmFile, ['--list-games'], {'cwd': scummvmPath, 'shell': true});
+  let scummvm = spawn(scummvmFile, ['--list-targets'], {'cwd': scummvmPath, 'shell': true});
 
   scummvm.stdout.on('data', (data) => {
     rawData += data.toString();
@@ -1129,19 +981,38 @@ function getInstalledGames() {
   });
 
   scummvm.on('exit', (code) => {
-    alert(rawData);
+    rawDataList = rawData.split("\r\n");
     if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
     for (i=2; i<rawDataList.length-1; i++) {
       let parsedData = rawDataList[i].match(/(.+?)[ ]{1,}(.+)$/);
       let rawGameId = parsedData[1];
       let parsedGameName;
-      parsedGameName = ["", parsedData[2], "Default"];
-      let longName = parsedGameName[1].trim();
-      let firstLetter = longName.charAt(0).toUpperCase();
-      longName = firstLetter + longName.slice(1);
-      if (longName.substr(0, 4) == "The ") longName = longName.substr(4) + ", The";     
-      installed[rawGameId] = {"name": longName, "versions": []}
-      installed[rawGameId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
+      if (parsedData[2].includes("(")) {
+        parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
+      } else {
+        parsedGameName = ["", parsedData[2], "Default"];
+      }
+      let rawGameIdList = rawGameId.split("-");
+      let numPieces = rawGameIdList.length
+      let found = false;
+      while ((!found) && (numPieces > 0)) {
+        let testId = rawGameIdList.slice(0,numPieces).join("-");
+        if (testId in gameData) {
+          found = true;
+          if (testId in installed) {
+            installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
+          } else {
+            let longName = parsedGameName[1].trim();
+            let firstLetter = longName.charAt(0).toUpperCase();
+            longName = firstLetter + longName.slice(1);
+            if (longName.substr(0, 4) == "The ") longName = longName.substr(4) + ", The";
+            installed[testId] = {"name": longName, "versions": []};
+            installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
+          }
+        } else {
+          numPieces--;
+        }
+      }
     }
     updateDefaultVersions();
     drawCategories();
@@ -1229,44 +1100,22 @@ function detectGame(gamePath) {
   });
 
   scummvm.on('exit', (code) => {
-    if (!rawData.includes("GameID")) {
-      alertObj = $("<i></i>", {"class": "fas fa-exclamation-triangle warning-color fa-3x"});
-      $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(alertObj);
-      $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html("No game was detected.");
-      showModal("#unknown-modal");
-      return;
-    }
-    console.log(rawData);
     rawDataList = rawData.split("\r\n");
     if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
-    let tempParsedData = [];
-    let foundHeader = false;
-    for (i=0; i<rawDataList.length; i++) {
-      if (rawDataList[i].includes("GameID")) {
-        foundHeader = true;
-      }
-      if (foundHeader) {
-        tempParsedData.push(rawDataList[i]);
-      }
-    }
-
-    let parsedData = tempParsedData[2].match(/.+?:(.+?)[ ].+?([a-zA-Z0-9].+?)[ ]([a-zA-Z]:|\/)/);
-    console.log(parsedData);
-    //let parsedData = rawDataList[2].match(/.+?:(.+?)[ ]{2,}(.+?)[ ]{2,}/);
+    let parsedData = rawDataList[2].match(/.+?:(.+?)[ ]{2,}(.+?)[ ]{2,}/);
     if (parsedData) {
       let shortName = parsedData[1].trim();
-      let fullName = parsedData[2].trim();
       let category = gameData[shortName]['category'];
-      let imagePath = __dirname+`/boxart/${shortName}.jpg`;
+      let imagePath = __dirname+`/boxart/${category}/${shortName}.jpg`;
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
          imagePath = "boxart/missing.jpg";
       }
-      if (fullName.includes("(")) {
-        parsedGameName = fullName.match(/^(.+?)\((.+?)\)$/);
+      if (parsedData[2].includes("(")) {
+        parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
       } else {
-        parsedGameName = ["", fullName, ""];
+        parsedGameName = ["", parsedData[2], "Default"];
       }
       let alreadyInstalled = false;
       if (shortName in installed) {
@@ -1298,6 +1147,11 @@ function detectGame(gamePath) {
         $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("A game has been detected. Would you like to import it?");
         showModal("#add-modal");
       }
+    } else {
+      alertObj = $("<i></i>", {"class": "fas fa-exclamation-triangle warning-color fa-3x"});
+      $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(alertObj);
+      $("#unknown-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html("No game was detected.");
+      showModal("#unknown-modal");
     }
   })
 }
