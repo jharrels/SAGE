@@ -964,60 +964,23 @@ function drawGames() {
 
 function getInstalledGames() {
   installed = {};
-  let rawData = "";
-  let scummvmFile = path.basename(scummyConfig['scummvmPath']);
-  let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
-  if (os.type() == 'Darwin') {
-    scummvmPath = scummyConfig['scummvmPath']+"/Contents/MacOS";
-    scummvmFile = "./scummvm";
-  }
-  let scummvm = spawn(scummvmFile, ['--list-targets'], {'cwd': scummvmPath, 'shell': true});
-
-  scummvm.stdout.on('data', (data) => {
-    rawData += data.toString();
-  });
-
-  scummvm.stderr.on('data', (data) => {
-  });
-
-  scummvm.on('exit', (code) => {
-    rawDataList = rawData.split("\r\n");
-    if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
-    for (i=2; i<rawDataList.length-1; i++) {
-      let parsedData = rawDataList[i].match(/(.+?)[ ]{1,}(.+)$/);
-      let rawGameId = parsedData[1];
-      let parsedGameName;
-      if (parsedData[2].includes("(")) {
-        parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
+  for (const key in scummvmConfig) {
+    if (key != "scummvm") {
+      let gameName = scummvmConfig[key]['description'].replace(/\s\([^()]*\)$/, '');
+      let versionText = scummvmConfig[key]['description'].replace(/.*\(([^()]+)\)$/, '$1');
+      let gameId = scummvmConfig[key]['engineid']+":"+scummvmConfig[key]['gameid'];
+      if (gameId in installed) {
+        installed[gameId]['versions'].push({"version": versionText, "versionShortName": key});
       } else {
-        parsedGameName = ["", parsedData[2], "Default"];
-      }
-      let rawGameIdList = rawGameId.split("-");
-      let numPieces = rawGameIdList.length
-      let found = false;
-      while ((!found) && (numPieces > 0)) {
-        let testId = rawGameIdList.slice(0,numPieces).join("-");
-        if (testId in gameData) {
-          found = true;
-          if (testId in installed) {
-            installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
-          } else {
-            let longName = parsedGameName[1].trim();
-            let firstLetter = longName.charAt(0).toUpperCase();
-            longName = firstLetter + longName.slice(1);
-            if (longName.substr(0, 4) == "The ") longName = longName.substr(4) + ", The";
-            installed[testId] = {"name": longName, "versions": []};
-            installed[testId]['versions'].push({"version": parsedGameName[2], "versionShortName": rawGameId});
-          }
-        } else {
-          numPieces--;
-        }
+        if (gameName.substr(0, 4) == "The ") gameName = gameName.substr(4) + ", The";
+        installed[gameId] = {"name": gameName, "versions": []};
+        installed[gameId]['versions'].push({"version": versionText, "versionShortName": key});
       }
     }
-    updateDefaultVersions();
-    drawCategories();
-    drawGames();
-  });
+  }
+  updateDefaultVersions();
+  drawCategories();
+  drawGames();
 }
 
 function updateDefaultVersions() {
