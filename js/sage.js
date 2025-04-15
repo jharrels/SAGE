@@ -820,6 +820,7 @@ function drawCategories() {
     installedCategories[key] = 0;
   });
   Object.keys(installed).forEach(key => {
+    console.log(key);
     installedCategories[gameData[key]['category']] += 1;
   });
   Object.keys(categories).sort().forEach(key => {

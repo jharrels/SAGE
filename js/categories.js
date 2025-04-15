@@ -36,7 +36,7 @@ var categories = {
   "sierra": "Sierra",
   "stranga": "Stranga",
   "synergy": "Synergy, Inc.",
-  "trilobye": "Trilobyte Games",
+  "trilobyte": "Trilobyte Games",
   "tsunami": "Tsunami Games",
   "wadjet": "Wadjet Eye Games",
   "westwood": "Westwood Studios",
