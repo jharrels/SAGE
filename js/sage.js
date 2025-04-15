@@ -921,11 +921,12 @@ function drawGames() {
     $(".main").html("").append(grid);
     tempGameList.forEach(key => {
       let category = gameData[longNames[key]]['category'];
-      let imagePath = __dirname+`/boxart/${category}/${longNames[key]}.jpg`;
+      let boxart = longNames[key].replace(":","_");
+      let imagePath = __dirname+`/boxart/${category}/${boxart}.jpg`;
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
-        console.log(`Missing: boxart/${category}/${longNames[key]}.jpg`);
+        console.log(`Missing: boxart/${category}/${boxart}.jpg`);
          imagePath = "boxart/missing.jpg";
       }
       let gameImageObj = $("<img></img", {"src": imagePath});
