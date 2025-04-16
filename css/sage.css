@@ -117,7 +117,7 @@ html {
 }
 
 .leftMenuBar {
-  position: static;
+  position: absolute;
   display: inline-block;
   top: 0px;
   left: 305px;
@@ -244,13 +244,13 @@ html {
   box-sizing: border-box;
 }
 
-#grid {
+.grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-gap: 10px;
 }
 
-#grid>div img {
+.grid>div img {
   width: 100%;
   height: auto;
   border-radius: 5px;
@@ -259,7 +259,7 @@ html {
   transition: all .25s;
 }
 
-#grid>div span {
+.grid>div span {
   font-family: sans-serif;
   color: #1B262C;
   font-size: .8em;
@@ -272,40 +272,40 @@ html {
   text-align: center;
 }
 
-#grid>div.disabled {
+.grid>div.disabled {
   opacity: 0.5;
   cursor: no-drop;
 }
 
-#grid>div.disabled img {
+.grid>div.disabled img {
   filter: saturate(0);
 }
 
-#grid>div img:hover {
+.grid>div img:hover {
   filter: brightness(1.2) contrast(1.0);
   transition: all .25s;
   transform: scale(1.03, 1.03);
 }
 
-#grid>div img.active {
+.grid>div img.active {
   filter: brightness(1.2) contrast(1.0);
   transition: all .25s;
   transform: scale(1.03, 1.03);
 }
 
-#grid>div.disabled img:hover {
+.grid>div.disabled img:hover {
   filter: saturate(0);
   transition: none;
   transform: none;
 }
 
-#grid>div.disabled img.active {
+.grid>div.disabled img.active {
   filter: saturate(0);
   transition: none;
   transform: none;
 }
 
-#list>div {
+.list>div {
   border-radius: 5px;
   background: rgba(0,0,0,0.1);
   margin-bottom: 5px;
@@ -313,14 +313,14 @@ html {
   transition: all .25s;
 }
 
-#list>div img {
+.list>div img {
   width: 30px;
   height: auto;
   border-radius: 5px;
   transition: all .25s;
 }
 
-#list>div span {
+.list>div span {
   margin-left: 10px;
   display: inline-block;
   font-size: 1em;
@@ -336,44 +336,44 @@ html {
   left: 0;
 }
 
-#list>div.disabled {
+.list>div.disabled {
   opacity: 0.5;
 }
 
-#list>div.disabled img {
+.list>div.disabled img {
   filter: saturate(0);
 }
 
-#list>div.game:hover {
+.list>div.game:hover {
   filter: brightness(1.2) contrast(1.0);
   transition: all .25s;
   transform: scale(1.01, 1.01);
   background: rgba(0,0,0,0.2);
 }
 
-#list>div.game:hover > img {
+.list>div.game:hover > img {
   transition: all .25s;
   transform: scale(1.15, 1.15);
 }
-#list>div.game.active {
+.list>div.game.active {
   filter: brightness(1.2) contrast(1.0);
   transition: all .25s;
   transform: scale(1.01, 1.01);
   background: rgba(0,0,0,0.2);
 }
 
-#list>div.game.active > img {
+.list>div.game.active > img {
   transition: all .25s;
   transform: scale(1.15, 1.15);
 }
 
-#list>div.game.disabled img:hover {
+.list>div.game.disabled img:hover {
   filter: saturate(0);
   transition: none;
   transform: none;
 }
 
-#list>div.game.disabled img.active {
+.list>div.game.disabled img.active {
   filter: saturate(0);
   transition: none;
   transform: none;
@@ -389,7 +389,7 @@ html {
 }
 
 .group-header.first {
-  margin-top: 0 !important;
+  margin-top: 0 !important;SDo
 }
 
 /*----------------------------------------
