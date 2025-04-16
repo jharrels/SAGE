@@ -35,7 +35,8 @@ let titlebar = new customTitlebar.Titlebar({
    LOAD PREFS AND SETUP THE GUI AT LAUNCH
 ---------------------------------------------------------------------------- */
 var listMode = store.get('listMode');
-if (listMode === undefined) listMode = "gallery";
+if (listMode === undefined) listMode = "grid";
+
 var favorites = store.get('favorites');
 if (favorites === undefined) favorites = [];
 var defaultVersion = store.get('defaultVersion');
@@ -46,6 +47,12 @@ var recentList = store.get('recentList');
 if (recentList === undefined) recentList = [];
 var scummyConfig = store.get('scummyConfig');
 if (scummyConfig === undefined) scummyConfig = {};
+
+// Migrate settings to 1.1.0+
+if (listMode == "gallery") {
+  listMode = "grid";
+  store.set('listMode', listMode);
+}
 
 $(`#${listMode}-view`).addClass("active");
 
@@ -228,11 +235,11 @@ $("#add-game").on("click", () => {
   }
 });
 
-$("#gallery-view").on("click", () => {
-  if (!$("gallery-view").hasClass("active")) {
+$("#grid-view").on("click", () => {
+  if (!$("grid-view").hasClass("active")) {
     $("#list-view").removeClass("active");
-    $("#gallery-view").addClass("active");
-    listMode = "gallery";
+    $("#grid-view").addClass("active");
+    listMode = "grid";
     store.set('listMode', listMode);
     drawGames();
   }
@@ -240,7 +247,7 @@ $("#gallery-view").on("click", () => {
 
 $("#list-view").on("click", () => {
   if (!$("list-view").hasClass("active")) {
-    $("#gallery-view").removeClass("active");
+    $("#grid-view").removeClass("active");
     $("#list-view").addClass("active");
     listMode = "list";
     store.set('listMode', listMode);
@@ -399,7 +406,7 @@ $("#context-menu").on("click", ".favorite", function(e) {
 $(".main").on("contextmenu", ".game", function(e) {
   let gameId = $(this).attr("id");
   selectedGame = gameId;
-  if (listMode == "gallery") $(this).children("img").addClass("active");
+  if (listMode == "grid") $(this).children("img").addClass("active");
   if (listMode == "list") $(this).addClass("active");
   $("#context-menu").children(".launch-items").html("");
   for (i=0; i<installed[gameId]['versions'].length; i++) {
@@ -430,7 +437,7 @@ $(".main").on("contextmenu", ".game", function(e) {
 
 $("#context-menu").on("mouseleave", () => {
   $("#context-menu").fadeOut(250);
-  if (listMode == "gallery") $(`#${selectedGame}`).children("img").removeClass("active");
+  if (listMode == "grid") $(`#${selectedGame}`).children("img").removeClass("active");
   if (listMode == "list") $(`#${selectedGame}`).removeClass("active");
 });
 
@@ -820,7 +827,6 @@ function drawCategories() {
     installedCategories[key] = 0;
   });
   Object.keys(installed).forEach(key => {
-    console.log(key);
     installedCategories[gameData[key]['category']] += 1;
   });
   Object.keys(categories).sort().forEach(key => {
@@ -916,13 +922,12 @@ function drawGames() {
   }
   let tempGameList = Object.keys(longNames);
   if (selectedCategory != "recent") tempGameList = Object.keys(longNames).sort();
-  if (listMode == "gallery") {
-    let grid = $("<div></div>", {"id": "grid"});
-    $(".main").html("").append(grid);
+  let gamesContainer = $("<div></div>", {"id": listMode});
+    $(".main").html("").append(gamesContainer);
     tempGameList.forEach(key => {
       let category = gameData[longNames[key]]['category'];
       let boxart = longNames[key].replace(":","_");
-      let imagePath = __dirname+`/boxart/${category}/${boxart}.jpg`;
+      let imagePath = __dirname+`/boxart/${boxart}.jpg`;
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
@@ -938,30 +943,8 @@ function drawGames() {
       if (scummyConfig['showTitles']) gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
       let sdefault = defaultVersion[longNames[key]];
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
-      $("#grid").append(rowObj);
+      $("#"+listMode).append(rowObj);
     });
-  }
-  if (listMode == "list") {
-    let list = $("<div></div>", {"id": "list"});
-    $(".main").html("").append(list);
-    tempGameList.forEach(key => {
-      let category = gameData[longNames[key]]['category'];
-      let imagePath = __dirname+`/boxart/${category}/${longNames[key]}.jpg`;
-      try {
-        fs.accessSync(imagePath, fs.constants.R_OK);
-      } catch(err) {
-         imagePath = "boxart/missing.jpg";
-      }
-      let gameImageObj = $("<img></img", {"src": imagePath});
-      let favoriteObj = "";
-      if (scummyConfig['showFavoriteIcon']) {
-        if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
-      }
-      let gameNameObj = $("<span></span>").text(key).prepend(favoriteObj);
-      let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": defaultVersion[key]}).append(gameImageObj).append(gameNameObj);
-      $("#list").append(rowObj);
-    });
-  }
 }
 
 function getInstalledGames() {
@@ -1067,48 +1050,46 @@ function detectGame(gamePath) {
   scummvm.on('exit', (code) => {
     rawDataList = rawData.split("\r\n");
     if ((os.type() == "Darwin") || (os.type() == "Linux")) rawDataList = rawData.split("\n");
-    let parsedData = rawDataList[2].match(/.+?:(.+?)[ ]{2,}(.+?)[ ]{2,}/);
-    if (parsedData) {
-      let shortName = parsedData[1].trim();
-      let category = gameData[shortName]['category'];
-      let imagePath = __dirname+`/boxart/${category}/${shortName}.jpg`;
+    let gameId = rawDataList[2].replace(/(.+?:.+?)\s{1,}.*/, '$1');
+    let completeGameName = rawDataList[2].replace(/.+?\s{1,}(.+?\))\s{1,}.*/, '$1');
+    let gameName = completeGameName.replace(/\s\([^()]*\)$/, '');
+    const versionText = completeGameName.replace(/.*\(([^()]+)\)$/, '$1');
+    if (gameId.includes(":")) {
+      let boxart = gameId.replace(":","_");
+      let category = gameData[gameId]['category'];
+      let imagePath = __dirname+`/boxart/${boxart}.jpg`;
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
          imagePath = "boxart/missing.jpg";
       }
-      if (parsedData[2].includes("(")) {
-        parsedGameName = parsedData[2].match(/^(.+?)\((.+?)\)$/);
-      } else {
-        parsedGameName = ["", parsedData[2], "Default"];
-      }
       let alreadyInstalled = false;
-      if (shortName in installed) {
-        for (i=0; i<installed[shortName]['versions'].length; i++) {
-          if (installed[shortName]['versions'][i]['version'] == parsedGameName[2]) alreadyInstalled = true;
+      if (gameId in installed) {
+        for (i=0; i<installed[gameId]['versions'].length; i++) {
+          if (installed[gameId]['versions'][i]['version'] == versionText) alreadyInstalled = true;
         }
       }
       if (alreadyInstalled) {
         let imageObj = $("<img></img", {"src": imagePath});
         $("#exists-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(imageObj);
-        let versionObj = $("<small></small>").text(`(${parsedGameName[2]})`);
-        let gameNameObj = $("<span></span>", {"class": "game-name"}).text(parsedGameName[1]).append(versionObj);
+        let versionObj = $("<small></small>").text(`(${versionText})`);
+        let gameNameObj = $("<span></span>", {"class": "game-name"}).text(gameName).append(versionObj);
         $("#exists-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("This version of this game has already been imported.");
         showModal("#exists-modal");
       }
-      if ((!alreadyInstalled) && (shortName in installed)) {
+      if ((!alreadyInstalled) && (gameId in installed)) {
         let imageObj = $("<img></img", {"src": imagePath});
         $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(imageObj);
-        let versionObj = $("<small></small>").text(`(${parsedGameName[2]})`);
-        let gameNameObj = $("<span></span>", {"class": "game-name"}).text(parsedGameName[1]).append(versionObj);
-        $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("A game has been detected. Would you like to import it?");
+        let versionObj = $("<small></small>").text(`(${versionText})`);
+        let gameNameObj = $("<span></span>", {"class": "game-name"}).text(gameName).append(versionObj);
+        $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("A new version of this game has been detected. Would you like to import it?");
         showModal("#add-modal");
       }
-      if ((!alreadyInstalled) && (!(shortName in installed))) {
+      if ((!alreadyInstalled) && (!(gameId in installed))) {
         let imageObj = $("<img></img", {"src": imagePath});
         $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-boxart").html(imageObj);
-        let versionObj = $("<small></small>").text(`(${parsedGameName[2]})`);
-        let gameNameObj = $("<span></span>", {"class": "game-name"}).text(parsedGameName[1]).append(versionObj);
+        let versionObj = $("<small></small>").text(`(${versionText})`);
+        let gameNameObj = $("<span></span>", {"class": "game-name"}).text(gameName).append(versionObj);
         $("#add-modal").children(".modal-wrapper").children(".modal-body").children(".modal-message").html(gameNameObj).append("A game has been detected. Would you like to import it?");
         showModal("#add-modal");
       }

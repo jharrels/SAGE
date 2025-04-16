@@ -117,8 +117,9 @@ html {
 }
 
 .leftMenuBar {
-  position: absolute;
+  position: static;
   display: inline-block;
+  top: 0px;
   left: 305px;
   padding: 10px 20px;
   z-index: 3;
