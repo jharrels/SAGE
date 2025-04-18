@@ -18,6 +18,7 @@ var scummvmConfig = {};
 var scummyConfig = {};
 var tempConfig = {};
 var installed;
+var installedCategories;
 var selectedGame = "";
 var selectedConfig = "";
 var importGamePath = "";
@@ -36,7 +37,8 @@ let titlebar = new customTitlebar.Titlebar({
 ---------------------------------------------------------------------------- */
 var listMode = store.get('listMode');
 if (listMode === undefined) listMode = "grid";
-
+var groupItems = store.get('groupItems');
+if (groupItems === undefined) groupItems = false;
 var favorites = store.get('favorites');
 if (favorites === undefined) favorites = [];
 var defaultVersion = store.get('defaultVersion');
@@ -55,6 +57,7 @@ if (listMode == "gallery") {
 }
 
 $(`#${listMode}-view`).addClass("active");
+if (groupItems) $("#group-items").addClass("active");
 
 parseScummyConfig();
 checkInitState();
@@ -251,6 +254,20 @@ $("#list-view").on("click", () => {
     $("#list-view").addClass("active");
     listMode = "list";
     store.set('listMode', listMode);
+    drawGames();
+  }
+});
+
+$("#group-items").on("click", () => {
+  if (!$("#group-items").hasClass("active")) {
+    $("#group-items").addClass("active");
+    groupItems = true;
+    store.set('groupItems', groupItems);
+    drawGames();
+  } else {
+    $("#group-items").removeClass("active");
+    groupItems = false;
+    store.set('groupItems', groupItems);
     drawGames();
   }
 });
@@ -822,17 +839,18 @@ function drawCategories() {
   $("#sideBarCategories").html("");
   $("#all").html(Object.keys(installed).length);
   $("#favorites").html(favorites.length);
-  let installedCategories = {};
+  installedCategories = {};
   Object.keys(categories).forEach(key => {
-    installedCategories[key] = 0;
+    installedCategories[key] = {"count": 0, "installed": []};
   });
   Object.keys(installed).forEach(key => {
-    installedCategories[gameData[key]['category']] += 1;
+    installedCategories[gameData[key]['category']]['count'] += 1;
+    installedCategories[gameData[key]['category']]['installed'].push(key);
   });
   Object.keys(categories).sort().forEach(key => {
-    if (installedCategories[key] > 0) {
+    if (installedCategories[key]['count'] > 0) {
       let tmpIcon = $("<i></i>", {"class": "fas fa-bookmark fa-fw bookmark"});
-      let tmpCount = $("<span></span>", {"class":"badge"}).text(installedCategories[key]);
+      let tmpCount = $("<span></span>", {"class":"badge"}).text(installedCategories[key]['count']);
       let tmpObject = $("<div></div>", {"class":"sideBarItem", "id": `category-${key}`}).text(categories[key]).prepend(tmpIcon).append(tmpCount);
       $("#sideBarCategories").append(tmpObject);
     }
@@ -842,6 +860,7 @@ function drawCategories() {
     $("#sideBarCategories").hide();
     if (selectedCategory != "category-all") $("#category-all").click()
   }
+  console.log(installedCategories);
 }
 
 function drawGameInfo(gameId) {
@@ -895,8 +914,8 @@ function drawGameInfo(gameId) {
 }
 
 function drawGames() {
-  $("#grid").remove();
-  $("#list").remove();
+  $(".grid").remove();
+  $(".list").remove();
   let longNames = {};
   if (selectedCategory == "recent") {
     recentList.forEach(key => {
@@ -922,7 +941,7 @@ function drawGames() {
   }
   let tempGameList = Object.keys(longNames);
   if (selectedCategory != "recent") tempGameList = Object.keys(longNames).sort();
-  let gamesContainer = $("<div></div>", {"id": listMode});
+  let gamesContainer = $("<div></div>", {"class": listMode});
     $(".main").html("").append(gamesContainer);
     tempGameList.forEach(key => {
       let category = gameData[longNames[key]]['category'];
@@ -943,7 +962,7 @@ function drawGames() {
       if (scummyConfig['showTitles']) gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
       let sdefault = defaultVersion[longNames[key]];
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
-      $("#"+listMode).append(rowObj);
+      $("."+listMode).append(rowObj);
     });
 }
 
