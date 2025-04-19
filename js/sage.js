@@ -916,22 +916,42 @@ function drawGameInfo(gameId) {
 function drawGames() {
   $(".grid").remove();
   $(".list").remove();
+  $(".main").html("")
+  if (groupItems) {
+    let listId = 1;
+    Object.keys(categories).sort().forEach(key => {
+      if (installedCategories[key]['count'] > 0) {
+        let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
+        if (listId == 1) groupHeader.addClass("first");
+        $(".main").append(groupHeader);
+        listId = drawGameList(installedCategories[key]['installed'], listId);
+      }
+    });
+  } else {
+    drawGameList(Object.keys(installed));
+  }
+  
+}
+
+function drawGameList(gameList, listId=1) {
   let longNames = {};
   if (selectedCategory == "recent") {
     recentList.forEach(key => {
-      if (installed.hasOwnProperty(key)) {
+      if (gameList.includes(key)) {
         longNames[installed[key]['name']] = key;
       }
     });
   }
   if (selectedCategory == "all") {
-    Object.keys(installed).forEach(key => {
-      longNames[installed[key]['name']] = key;
+    gameList.forEach(gameId => {
+      longNames[installed[gameId]['name']] = gameId;
     });
   }
   if (selectedCategory == "favorites") {
-    favorites.forEach(key => {
-      longNames[installed[key]['name']] = key;
+    favorites.forEach(gameId => {
+      if (gameList.includes(gameId)) {
+        longNames[installed[gameId]['name']] = gameId;
+      }
     });
   }
   if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
@@ -941,8 +961,8 @@ function drawGames() {
   }
   let tempGameList = Object.keys(longNames);
   if (selectedCategory != "recent") tempGameList = Object.keys(longNames).sort();
-  let gamesContainer = $("<div></div>", {"class": listMode});
-    $(".main").html("").append(gamesContainer);
+  let gamesContainer = $("<div></div>", {"class": listMode, "id": "listContainer"+listId.toString()});
+  $(".main").append(gamesContainer);
     tempGameList.forEach(key => {
       let category = gameData[longNames[key]]['category'];
       let boxart = longNames[key].replace(":","_");
@@ -962,8 +982,9 @@ function drawGames() {
       if (scummyConfig['showTitles']) gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
       let sdefault = defaultVersion[longNames[key]];
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
-      $("."+listMode).append(rowObj);
+      $("#listContainer"+listId.toString()).append(rowObj);
     });
+    return listId+1;
 }
 
 function getInstalledGames() {
