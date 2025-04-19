@@ -860,7 +860,6 @@ function drawCategories() {
     $("#sideBarCategories").hide();
     if (selectedCategory != "category-all") $("#category-all").click()
   }
-  console.log(installedCategories);
 }
 
 function drawGameInfo(gameId) {
@@ -918,15 +917,60 @@ function drawGames() {
   $(".list").remove();
   $(".main").html("")
   if (groupItems) {
-    let listId = 1;
-    Object.keys(categories).sort().forEach(key => {
-      if (installedCategories[key]['count'] > 0) {
+    if (selectedCategory == "all") {
+      let listId = 1;
+      Object.keys(categories).sort().forEach(key => {
+        if (installedCategories[key]['count'] > 0) {
+          let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
+          if (listId == 1) groupHeader.addClass("first");
+          $(".main").append(groupHeader);
+          listId = drawGameList(installedCategories[key]['installed'], listId);
+        }
+      });
+    }
+    if (selectedCategory == "favorites") {
+      let listId = 1;
+      favoriteCategories = {};
+      for (i=0; i<favorites.length; i++) {
+        categoryKey = gameData[favorites[i]]['category'];
+        if (!(categoryKey in favoriteCategories)) favoriteCategories[categoryKey] = [];
+        favoriteCategories[categoryKey].push(favorites[i]);
+      }
+      Object.keys(favoriteCategories).sort().forEach(key => {
         let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
         if (listId == 1) groupHeader.addClass("first");
         $(".main").append(groupHeader);
-        listId = drawGameList(installedCategories[key]['installed'], listId);
+        listId = drawGameList(favoriteCategories[key], listId);
+      });
+    } 
+    if (selectedCategory == "recent") {
+      let listId = 1;
+      recentCategories = {};
+      for (i=0; i<recentList.length; i++) {
+        if (recentList[i] in installed) {
+          categoryKey = gameData[recentList[i]]['category'];
+          if (!(categoryKey in recentCategories)) recentCategories[categoryKey] = [];
+          recentCategories[categoryKey].push(recentList[i]);
+        }
       }
-    });
+      Object.keys(recentCategories).sort().forEach(key => {
+        let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
+        if (listId == 1) groupHeader.addClass("first");
+        $(".main").append(groupHeader);
+        listId = drawGameList(recentCategories[key], listId);
+      });
+    } 
+    if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
+      listId = 1;
+      let categoryList = {};
+      Object.keys(installed).forEach(key => {
+        if (selectedCategory == gameData[key]['category']) categoryList[installed[key]['name']] = key;
+      });
+      let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[selectedCategory]);
+      if (listId == 1) groupHeader.addClass("first");
+      $(".main").append(groupHeader);
+      listId = drawGameList(categoryList, listId);
+    }
   } else {
     drawGameList(Object.keys(installed));
   }
@@ -955,9 +999,7 @@ function drawGameList(gameList, listId=1) {
     });
   }
   if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
-    Object.keys(installed).forEach(key => {
-      if (selectedCategory == gameData[key]['category']) longNames[installed[key]['name']] = key;
-    });
+    longNames = gameList;
   }
   let tempGameList = Object.keys(longNames);
   if (selectedCategory != "recent") tempGameList = Object.keys(longNames).sort();
