@@ -1,7 +1,7 @@
 var categories = {
   "access": "Access Software",
   "activision": "Activision",
-  "ags": "Adventure Game Studio Games",
+  "ags": "Adventure Game Studio",
   "adventuresoft": "Adventure/Horror Soft",
   "animagic": "Animation Magic",
   "cloak": "Cloak & Dagger Games",
