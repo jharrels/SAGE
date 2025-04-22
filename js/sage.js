@@ -972,7 +972,16 @@ function drawGames() {
       listId = drawGameList(categoryList, listId);
     }
   } else {
-    drawGameList(Object.keys(installed));
+    if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
+      let categoryList = {};
+      Object.keys(installed).forEach(key => {
+        if (selectedCategory == gameData[key]['category']) categoryList[installed[key]['name']] = key;
+      });
+      listId = drawGameList(categoryList);
+    } else {
+      drawGameList(Object.keys(installed));  
+    }
+    
   }
   
 }
@@ -1012,7 +1021,7 @@ function drawGameList(gameList, listId=1) {
       try {
         fs.accessSync(imagePath, fs.constants.R_OK);
       } catch(err) {
-        console.log(`Missing: boxart/${category}/${boxart}.jpg`);
+        console.log(`Missing: boxart/${boxart}.jpg`);
          imagePath = "boxart/missing.jpg";
       }
       let gameImageObj = $("<img></img", {"src": imagePath});

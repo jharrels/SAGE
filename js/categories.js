@@ -14,7 +14,7 @@ var categories = {
   "fan": "Fan Games",
   "gda": "Gray Design Associates",
   "her": "Her Interactive",
-  "humongous": "Humongous Entertainment",
+  "humongous": "Humongous Entertain.",
   "if": "Interactive Fiction",
   "incentive": "Incentive Software",
   "ita": "ITA-Choco", 
@@ -40,5 +40,5 @@ var categories = {
   "tsunami": "Tsunami Games",
   "wadjet": "Wadjet Eye Games",
   "westwood": "Westwood Studios",
-  "wintermute": "Wintermute Engine Games"
+  "wintermute": "Wintermute Engine"
 };
