@@ -9,19 +9,19 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/jharrels/scummy">
+  <a href="https://github.com/jharrels/SAGE">
     <img src="https://j-topia.com/images/scummy_logo.png" alt="Logo" width="100" height="100">
   </a>
 
-  <h3 align="center">Scummy</h3>
+  <h3 align="center">SAGE</h3><h4>(System for Aggregating Game Engines)</h4>
 
   <p align="center">
     A modern, clean front-end for SCUMMVM.
     <br />
     <br />
-    <a href="https://github.com/jharrels/scummy/issues">Report Bug</a>
+    <a href="https://github.com/jharrels/SAGE/issues">Report Bug</a>
     ·
-    <a href="https://github.com/jharrels/scummy/issues">Request Feature</a>
+    <a href="https://github.com/jharrels/SAGE/issues">Request Feature</a>
   </p>
 </p>
 
@@ -32,7 +32,7 @@
   <summary>Table of Contents</summary>
   <ol>
     <li>
-      <a href="#about-the-project">What is Scummy?</a>
+      <a href="#about-the-project">What is SAGE?</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
       </ul>
@@ -56,11 +56,11 @@
 
 
 <!-- ABOUT THE PROJECT -->
-## What is Scummy?
+## What is SAGE?
 
-[![Scummy][scummy-gallery]](https://j-topia.com/images/scummy_gallery.png)
+[![SAGE][scummy-gallery]](https://j-topia.com/images/scummy_gallery.png)
 
-Scummy is a well designed, clean, and modern front-end for SCUMMVM. For those who aren't familiar, SCUMMVM is an application which allow you to run classic graphic adventure and roleplaying games on modern systems. It is a fantastic application that has given many a chance to relive their childhood favorites, with minimal fuss.
+SAGE is a well designed, clean, and modern front-end for SCUMMVM. For those who aren't familiar, SCUMMVM is an application which allow you to run classic graphic adventure and roleplaying games on modern systems. It is a fantastic application that has given many a chance to relive their childhood favorites, with minimal fuss.
 
 A list of resources that I find helpful are listed in the acknowledgements.
 
@@ -72,7 +72,7 @@ A list of resources that I find helpful are listed in the acknowledgements.
 * [Font Awesome](https://fontawesome.com)
 
 ### We need help!
-Currently Scummy is being developed on a machine running Windows, but we purposely chose a cross-platform framework in which to develop it. We need help in the following areas:
+Currently SAGE is being developed on a machine running Windows, but we purposely chose a cross-platform framework in which to develop it. We need help in the following areas:
 * Mac-specific code and/or the ability to test on a Mac.
 * Linux-specific code and/or the ability to test on Linux.
 * Translations into other languages.
@@ -80,7 +80,7 @@ Currently Scummy is being developed on a machine running Windows, but we purpose
 <!-- GETTING STARTED -->
 ## Getting Started
 
-You've checked out Scummy and would like to contribute? Great! Here's how to set up a working copy locally.
+You've checked out SAGE and would like to contribute? Great! Here's how to set up a working copy locally.
 
 ### Prerequisites
 
@@ -94,13 +94,13 @@ This is an example of how to list things you need to use the software and how to
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/jharrels/scummy.git
+   git clone https://github.com/jharrels/SAGE.git
    ```
 3. Install NPM packages
    ```sh
    npm install
    ```
-4. Startup Scummy from the repo
+4. Startup SAGE from the repo
    ```sh
    npm test
    ```
@@ -109,7 +109,7 @@ This is an example of how to list things you need to use the software and how to
 
 <!-- ROADMAP -->
 ## Roadmap
-Version 1.0 of Scummy will be able to do everything SCUMMVM can do plus a few extras:
+Version 1.0 of SAGE will be able to do everything SCUMMVM can do plus a few extras:
 * **0.1.0** - ~~Obtain a list of installed games.~~ :heavy_check_mark:
 * **0.2.0** - ~~Display the list of installed games using either a grid view or a list view.~~ :heavy_check_mark:
 * **0.3.0** - ~~Install games via Scummy, including detecting an uninstalled game or a new version of an installed game.~~ :heavy_check_mark:
@@ -121,7 +121,7 @@ Version 1.0 of Scummy will be able to do everything SCUMMVM can do plus a few ex
 * **0.9.0** - ~~Display options for displaying recently played, all games, favorited games, and games by category (ie. LucasArts, Sierra, Delphine Software, etc).~~ :heavy_check_mark:
 * **0.10.0** - ~~GUI configuration options for Scummy.~~ :heavy_check_mark:
 * **0.11.0** - ~~Get automated builds working.~~ :heavy_check_mark:
-* 1.0.0 - Release.
+* **1.0.0** - ~~Release.~~ :heavy_check_mark:
 
 Planned features:
 * Organize games into player-made collections (for example: RPGs, Monkey Island, King's Quest, etc).
@@ -134,7 +134,7 @@ Planned features:
 * Add SCUMMVM configuration options.
 * Add compatibility for Mac and Linux.
 
-See the [open issues](https://github.com/jharrels/scummy/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/jharrels/SAGE/issues) for a list of proposed features (and known issues).
 
 
 
@@ -161,7 +161,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Project Link: [https://github.com/jharrels/scummy](https://github.com/jharrels/scummy)
+Project Link: [https://github.com/jharrels/SAGE](https://github.com/jharrels/SAGE)
 
 
 
@@ -180,15 +180,15 @@ Project Link: [https://github.com/jharrels/scummy](https://github.com/jharrels/s
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/jharrels/scummy.svg?style=for-the-badge
-[contributors-url]: https://github.com/jharrels/scummy/graphs/contributors
+[contributors-url]: https://github.com/jharrels/SAGE/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/jharrels/scummy.svg?style=for-the-badge
-[forks-url]: https://github.com/jharrels/scummy/network/members
+[forks-url]: https://github.com/jharrels/SAGE/network/members
 [stars-shield]: https://img.shields.io/github/stars/jharrels/scummy.svg?style=for-the-badge
-[stars-url]: https://github.com/jharrels/scummy/stargazers
+[stars-url]: https://github.com/jharrels/SAGE/stargazers
 [issues-shield]: https://img.shields.io/github/issues/jharrels/scummy.svg?style=for-the-badge
-[issues-url]: https://github.com/jharrels/scummy/issues
+[issues-url]: https://github.com/jharrels/SAGE/issues
 [license-shield]: https://img.shields.io/github/license/jharrels/scummy.svg?style=for-the-badge
-[license-url]: https://github.com/jharrels/scummy/blob/master/LICENSE
+[license-url]: https://github.com/jharrels/SAGE/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/justin-harrelson-a7b18549
 [scummy-gallery]: https://j-topia.com/images/scummy_gallery.png

@@ -1,0 +1,269 @@
+<html>
+  <head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Scummy is a SCUMMVM front end.">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="css/all.css" />
+    <link rel="stylesheet" id="theme-css" href="css/sage.css" />
+  </head>
+  <div class="sideBar">
+    <div class="sideBarItem" id="category-recent">
+      <i class="fas fa-clock fa-fw recent"></i>Recent
+    </div>
+    <div class="sideBarItem" id="category-all">
+      <i class="fas fa-layer-group fa-fw all"></i>All <span class="badge" id="all"></span>
+    </div>
+    <div class="sideBarItem" id="category-favorites">
+      <i class="fas fa-heart fa-fw favorites"></i>Favorites <span class="badge" id="favorites"></span>
+    </div>
+    <div id="sideBarCategories">
+      <div class="sideBarHeader">
+        CATEGORIES
+      </div>
+    </div>
+    <div class="menuButton bright" id="scummy-configure">
+      <i class="fas fa-cog fa-fw"></i>
+    </div>
+  </div>
+  <div class="leftMenuBar">
+    <div class="menuButton" id="add-game">
+      <i class="fas fa-plus fa-fw"></i>
+    </div>
+    <!--<div class="menuButton">
+      <i class="fas fa-search fa-fw"></i>
+    </div>-->
+  </div>
+  <div class="rightMenuBar">
+    <div class="menuButton" id="group-items">
+      <i class="fas fa-object-group fa-fw"></i>
+    </div><div class="menuButton no-right-radius no-right-margin" id="list-view">
+      <i class="fas fa-th-list fa-fw"></i>
+    </div><div class="menuButton no-left-radius no-left-margin" id="grid-view">
+      <i class="fas fa-th-large fa-fw"></i>
+    </div>
+  </div>
+  <div class="main">
+  </div>
+  <div id="context-menu">
+    <div class="launch-items">
+      <div class="play menu-item">
+        <i class="fas fa-play fa-fw"></i> Play
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="manage menu-item">
+      <i class="fas fa-sliders-h fa-fw"></i> Manage Game
+    </div>
+    <div class="favorite menu-item">
+      <i class="fas fa-heart fa-fw"></i> Favorite
+    </div>
+  </div>
+  <div class="modal" id="add-modal">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-boxart"></div>
+        <div class="modal-message"></div>
+      </div>
+      <div class="modal-footer">
+        <div id="add-modal-no" class="modal-button dark">No</div><div id="add-modal-yes" class="modal-button bright">Yes</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="remove-modal">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-boxart"></div>
+        <div class="modal-message"></div>
+      </div>
+      <div class="modal-footer">
+        <div id="remove-modal-no" class="modal-button bright">No</div><div id="remove-modal-yes" class="modal-button dark">Yes</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="exists-modal">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-boxart"></div>
+        <div class="modal-message"></div>
+      </div>
+      <div class="modal-footer">
+        <div id="exists-modal-close" class="modal-button dark">OK</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="unknown-modal">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-boxart"></div>
+        <div class="modal-message"></div>
+      </div>
+      <div class="modal-footer">
+        <div id="unknown-modal-close" class="modal-button dark">OK</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="game-configure-modal">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category engine-options-header">
+          Engine Options
+        </div>
+        <div class="engine-options-wrapper">
+        </div>
+        <hr>
+        <div class="modal-option-category graphics-options-header">
+          Graphics Options
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="override-graphics"> Override Global Graphics Options
+        </div>
+        <div class="graphics-options-wrapper">
+        </div>
+        <hr>
+        <div class="modal-option-category audio-options-header">
+          Audio Options
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="override-audio"> Override Global Audio Options
+        </div>
+        <div class="audio-options-wrapper">
+        </div>
+        <hr>
+        <div class="modal-option-category volume-options-header">
+          Volume Options
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="override-volume"> Override Global Volume Options
+        </div>
+        <div class="volume-options-wrapper">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="game-configure-modal-cancel" class="modal-button dark">Cancel</div><div id="game-configure-modal-save" class="modal-button bright">Save</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-configure-modal">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          General
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-favorite-icon"> Display favorite icon on titles
+        </div>
+        <hr>
+        <div class="modal-option-category engine-options-header">
+          Gallery View
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-title"> Display title under box art
+        </div>
+        <hr>
+        <div class="modal-option-category graphics-options-header">
+          Side Bar
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-categories"> Show pre-made categories
+        </div>
+        <div class="modal-option">
+          <input type="checkbox" id="gui-show-recents"> Show recently played games
+        </div>
+        <hr>
+        <div class="modal-option-category graphics-options-header">
+          Recents
+        </div>
+        <div class="modal-option">
+          <table>
+            <tr><td>Recently played games to remember</td><td><input type="range" min="5" max="30" id="gui-max-recents"><span id="gui-max-recents-text"></span></td></tr>
+          </table>
+        </div>
+        <hr>
+        <div class="modal-option-category graphics-options-header">
+          SCUMMVM Integration
+        </div>
+        <div class="modal-option">
+          SCUMMVM Executable:<br>
+          <span class="modal-secondary" id="scummvm-executable-path"></span><br>
+          <div class="modal-button dark no-float" id="change-scummvm-path">Change</div> <span class="config-error" id="scummvm-executable-error">Invalid SCUMMVM executable.</span>
+        </div>
+        <div class="modal-option">
+          SCUMMVM Configuration File:<br>
+          <span class="modal-secondary" id="scummvm-configuration-path"></span><br>
+          <div class="modal-button dark no-float" id="change-scummvm-config-path">Change</div>  <span class="config-error" id="scummvm-config-error">Invalid SCUMMVM configuration file.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="scummy-configure-modal-cancel" class="modal-button dark">Cancel</div><div id="scummy-configure-modal-save" class="modal-button bright">Save</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-init-modal-1">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          Welcome!
+        </div>
+        <div class="modal-option">
+          Welcome to Scummy, a front-end for SCUMMVM.<br><br>Before using Scummy, you'll need to configure a couple of options.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="init-next-1" class="modal-button bright">Start</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-init-modal-2">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          Step 1 of 2: SCUMMVM Executable
+        </div>
+        <div class="modal-option">
+          In order to integrate with SCUMMVM, you will need to specify the location of the SCUMMVM executable.<br><br>Please click on the button below, which will open a dialog. In the window that opens, locate SCUMMVM.exe and select it.<br><br>
+          Executable Location:<br>
+          <span class="modal-secondary" id="init-scummvm-executable-path"></span><br><br>
+          <div class="modal-button dark no-float" id="init-scummvm-path">Choose...</div> <span class="config-error" id="init-scummvm-executable-error">Invalid SCUMMVM executable.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="init-next-2" class="disabled-option modal-button bright">Next <i class="fas fa-chevron-right"></i></div><div id="init-back-2" class="modal-button bright"><i class="fas fa-chevron-left"></i> Back</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="scummy-init-modal-3">
+    <div class="modal-wrapper">
+      <div class="modal-body">
+        <div class="modal-option-category graphics-options-header">
+          Step 2 of 2: SCUMMVM Configuration File
+        </div>
+        <div class="modal-option">
+          Scummy detected a ScummVM configuration in the location below.<br><br>If you'd like to use a different configuration file, click the folder button.<br><br>
+          Configuration File Location:<br>
+          <span class="modal-secondary" id="init-scummvm-config-path"></span><br><br>
+          <div class="modal-button dark no-float" id="init-choose-scummvm-config-path">Choose...</div>  <span class="config-error" id="init-scummvm-config-error">Invalid SCUMMVM configuration file.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="init-next-3" class="modal-button bright">Finish</i></div><div id="init-back-3" class="modal-button bright"><i class="fas fa-chevron-left"></i> Back</div>
+      </div>
+    </div>
+  </div>
+  <div id="game-info">
+    <div class="menuButton bright" id="game-info-close">
+      <i class="fas fa-times fa-fw"></i>
+    </div>
+    <div class="game-info-wrapper">
+      <div class="game-info-boxart"></div>
+      <div class="launch-config"></div>
+    </div>
+  </div>
+  <script>let $ = require('jquery');</script>
+  <script src="js/gamedata.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/engineoptions.js"></script>
+  <script src="js/generalgameoptions.js"></script>
+  <script src="js/sage.js"></script>
+</html>

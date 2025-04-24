@@ -1,18 +1,18 @@
 {
-  "name": "Scummy",
-  "version": "1.0.2",
-  "description": "A front end for SCUMMVM.",
+  "name": "SAGE",
+  "version": "1.1.0",
+  "description": "A front end for multi-game engine reimplementations, such as SCUMMVM, Free in the Dark, GemRB, and others.",
   "main": "init.js",
   "scripts": {
     "test": "electron .",
-    "pack:win": "electron-packager . Scummy  --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=win32 --arch=x64,ia32 --icon=build_assets/icons/scummy.ico --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='Scummy'",
-    "pack:mac": "electron-packager . Scummy  --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=darwin --arch=x64.arm64 --icon=build_assets/icons/scummy.icns --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='Scummy'",
-    "pack:linux": "electron-packager . Scummy  --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=linux --arch=ia32,x64,armv7l,arm64 --icon=build_assets/icons/scummy_logo_1024.png --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='Scummy'",
+    "pack:win": "electron-packager . SAGE  --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=win32 --arch=x64,ia32 --icon=build_assets/icons/scummy.ico --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='Scummy'",
+    "pack:mac": "electron-packager . SAGE  --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=darwin --arch=x64.arm64 --icon=build_assets/icons/scummy.icns --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='Scummy'",
+    "pack:linux": "electron-packager . SAGE  --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=linux --arch=ia32,x64,armv7l,arm64 --icon=build_assets/icons/scummy_logo_1024.png --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='Scummy'",
     "build": "npm run pack:win && npm run pack:linux",
     "build:mac": "npm run pack:mac"
   },
   "author": "Justin Harrelson",
-  "license": "MIT",
+  "license": "ISC",
   "dependencies": {
     "custom-electron-titlebar": "^3.2.5",
     "electron-store": "^6.0.1",
