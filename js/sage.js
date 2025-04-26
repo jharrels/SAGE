@@ -293,7 +293,7 @@ $(".launch-config").on("click", ".play", function(e) {
 
 $(".launch-config").on("click", ".remove", function(e) {
   let category = gameData[selectedGame]['category'];
-  let imagePath = __dirname+`/boxart/${category}/${selectedGame}.jpg`;
+  let imagePath = __dirname+`/boxart/${selectedGame}.jpg`;
   try {
     fs.accessSync(imagePath, fs.constants.R_OK);
   } catch(err) {
@@ -865,7 +865,8 @@ function drawCategories() {
 function drawGameInfo(gameId) {
   selectedGame = gameId;
   let category = gameData[gameId]['category'];
-  let imagePath = __dirname+`/boxart/${category}/${gameId}.jpg`;
+  boxartId = gameId.replace(":", "_");
+  let imagePath = __dirname+`/boxart/${boxartId}.jpg`;
   try {
     fs.accessSync(imagePath, fs.constants.R_OK);
   } catch(err) {

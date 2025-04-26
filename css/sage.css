@@ -44,9 +44,13 @@ html {
   margin-right: 20px;
   padding: 5px 10px;
   font-family: sans-serif;
-  font-size: 15px;
+  font-size: 12px;
   color: white;
   opacity: 0.8;
+}
+
+.sideBarItem .larger {
+  font-size: 15px;
 }
 
 .sideBarItem.selected {
