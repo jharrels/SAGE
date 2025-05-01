@@ -28,6 +28,7 @@ html {
   top: 0;
   left: 0;
   overflow-y: scroll;
+  z-index: 6;
 }
 
 .sideBarHeader {
@@ -107,6 +108,22 @@ html {
 }
 
 #scummy-configure {
+  position: absolute;
+  bottom: 30px;
+
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-block;
+}
+
+#scummy-view-options {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  display: inline-block;
+}
+
+#add-game {
   position: absolute;
   bottom: 30px;
   left: 30px;
@@ -245,13 +262,13 @@ html {
   overflow-y: scroll;
   background: #BBE1FA;
   border-top-left-radius: 5px;
-  padding: 60px 30px 30px 30px;
+  padding: 30px 30px 30px 30px;
   box-sizing: border-box;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   grid-gap: 10px;
 }
 
@@ -494,6 +511,47 @@ Scrollbars
   font-size: 30px;
   color: #fff;
   text-shadow: 0px 0px 8px rgba(27, 39, 45, 1), 0px 0px 8px rgba(27, 39, 45, 1);
+}
+
+#view-menu {
+  display: inline-block;
+  position: absolute;
+  z-index: 5;
+  padding: 30px 20px;
+  width: calc(100vw - 300px);
+  backdrop-filter: blur(10px);
+  background-color: rgba(0,0,0,.80);
+  bottom: 0;
+  left: -100%;
+  transition: left 0.2s linear;
+}
+
+#view-menu p {
+  margin-bottom: 10px;
+  margin-top: 0px;
+}
+
+.view-menu-visible {
+  left: 300px !important;
+}
+
+.view-option {
+  display: inline-block;
+  text-align: center;
+  font-size: 1.2em;
+  font-family: sans-serif;
+  color: white;
+  margin-right: 40px;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 5px 0;
+  font-size: 12px;
+  font-weight: bold;
+  color: gray;
 }
 
 #context-menu {
