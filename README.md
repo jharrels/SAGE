@@ -13,7 +13,7 @@
     <img src="https://j-topia.com/images/sage_logo.png" alt="Logo" width="256" height="256">
   </a>
 
-  <h2 align="center">SAGE</h2><h4 align="center">(System for Aggregating Game Engines)</h4>
+  <h3 align="center">SAGE</h3><h4 align="center">(System for Aggregating Game Engines)</h4>
 
   <p align="center">
     A modern, clean front-end for SCUMMVM.
