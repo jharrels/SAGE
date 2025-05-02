@@ -1,13 +1,3 @@
-# NOTE: Discontinued.
-
-## The ScumMVM team has announced that one of the projects for the 2021 Google Summer of Code is to "improve the GUI by adding a graphical interface for game library management, so that games are displayed with cover art thumbnails, grouping options and various filtering fields." Sounds familiar, doesn't it?
-
-## Needless to say, this will offer everything Scummy was trying to offer, but built right into ScummVM. Effective immediately, I am halting development on Scummy. Thanks for anyone that stopped by!
-
-
-
-
-
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -70,7 +60,9 @@
 
 [![SAGE][sage-gallery]](https://j-topia.com/images/sage_gallery.png)
 
-SAGE is a well designed, clean, and modern front-end for SCUMMVM. For those who aren't familiar, SCUMMVM is an application which allow you to run classic graphic adventure and roleplaying games on modern systems. It is a fantastic application that has given many a chance to relive their childhood favorites, with minimal fuss.
+SAGE is a well designed, clean, and modern front-end for SCUMMVM. For those who aren't familiar, SCUMMVM is an application which allow you to run classic graphic adventure and roleplaying games on modern systems. It is a fantastic application that has given many a chance to relive their childhood favorites, with minimal fuss. Scummy (or SAGE, as it is now called) automatically reads the ScummVM configuration and presents the gamelist in, what we hope, is a much nicer format. You can add games directly through SAGE, install alternate versions, set your default version, set favorites, and more.
+
+This project was shelved for four years as it seemed like the ScummVM team, in 2021, was about to introduce something native that did exactly the same thing. However, this never came to pass, so this project has been restarted as of May 2025.
 
 A list of resources that I find helpful are listed in the acknowledgements.
 
