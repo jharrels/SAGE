@@ -160,6 +160,10 @@ html {
   font-family: sans-serif;
 }
 
+.menuButton.wide {
+  padding: 5px 30px;
+}
+
 .menuButton.bright {
   background-color: rgba(47, 59, 65, 0.7);
 }
