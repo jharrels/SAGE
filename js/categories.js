@@ -1,7 +1,7 @@
 var categories = {
   "access": "Access Software",
   "activision": "Activision",
-  "ags": "AGS Games",
+  "ags": "Adventure Game Studio",
   "adventuresoft": "Adventure/Horror Soft",
   "animagic": "Animation Magic",
   "cloak": "Cloak & Dagger Games",
@@ -14,7 +14,7 @@ var categories = {
   "fan": "Fan Games",
   "gda": "Gray Design Associates",
   "her": "Her Interactive",
-  "humongous": "Humongous Entertain.",
+  "humongous": "Humongous Entertaintainment",
   "if": "Interactive Fiction",
   "incentive": "Incentive Software",
   "ita": "ITA-Choco", 

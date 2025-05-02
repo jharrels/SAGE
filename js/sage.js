@@ -32,6 +32,12 @@ let titlebar = new customTitlebar.Titlebar({
   overflow: "hidden"
 });
 
+const gridObserver = new MutationObserver(() => {
+  $(".grid").css("grid-template-columns", `repeat(auto-fill, minmax(${ $("#box-size").val() }px, 1fr))`);
+});
+
+gridObserver.observe(document.body, { childList: true, subtree: true });
+
 /* ----------------------------------------------------------------------------
    LOAD PREFS AND SETUP THE GUI AT LAUNCH
 ---------------------------------------------------------------------------- */
@@ -49,6 +55,8 @@ var recentList = store.get('recentList');
 if (recentList === undefined) recentList = [];
 var scummyConfig = store.get('scummyConfig');
 if (scummyConfig === undefined) scummyConfig = {};
+var boxSize = store.get('boxSize');
+if (boxSize === undefined) boxSize = 200;
 
 // Migrate settings to 1.1.0+
 if (listMode == "gallery") {
@@ -58,6 +66,7 @@ if (listMode == "gallery") {
 
 $(`#${listMode}-view`).addClass("active");
 if (groupItems) $("#group-items").addClass("active");
+$("#box-size").val(boxSize);
 
 parseScummyConfig();
 checkInitState();
@@ -293,7 +302,7 @@ $(".launch-config").on("click", ".play", function(e) {
 
 $(".launch-config").on("click", ".remove", function(e) {
   let category = gameData[selectedGame]['category'];
-  let imagePath = __dirname+`/boxart/${category}/${selectedGame}.jpg`;
+  let imagePath = __dirname+`/boxart/${selectedGame}.jpg`;
   try {
     fs.accessSync(imagePath, fs.constants.R_OK);
   } catch(err) {
@@ -365,6 +374,26 @@ $(".sideBar").on("click", ".sideBarItem", function(e) {
   selectedCategory = $(this).attr("id").split("-")[1];
   store.set('selectedCategory', selectedCategory);
   drawGames();
+});
+
+$("#scummy-view-options").on("click", function() {
+  if (!$("#view-menu").hasClass("view-menu-visible")) {
+    $("#view-menu").addClass("view-menu-visible");
+    let buttonIcon = $("<i></i>", {"class": "fas fa-chevron-left fa-fw"});
+    $("#scummy-view-options").html(buttonIcon);
+  } else {
+    $("#view-menu").removeClass("view-menu-visible");
+    let buttonIcon = $("<i></i>", {"class": "fas fa-chevron-right fa-fw"});
+    $("#scummy-view-options").html(buttonIcon);    
+  }
+});
+
+$("#box-size").on("input", function() {
+  let minSize = $(this).val();
+  animateGridSize(boxSize, minSize);
+  boxSize = minSize;
+  store.set('boxSize', minSize);
+  $(".grid").css("grid-template-columns", `repeat(auto-fill, minmax(${minSize}px, 1fr))`);
 });
 
 $("#scummy-configure").on("click", function() {
@@ -569,6 +598,27 @@ $("#game-configure-modal-save").on("click", () => {
 /* ----------------------------------------------------------------------------
    FUNCTIONS
 ---------------------------------------------------------------------------- */
+function animateGridSize(start, end, duration = 500) {
+  let stepCount = 20; // Number of steps in the animation
+  let stepSize = (end - start) / stepCount;
+  let currentSize = start;
+  let stepInterval = duration / stepCount;
+
+  function step() {
+      currentSize += stepSize;
+
+      // Stop when we reach the target value
+      if ((stepSize > 0 && currentSize >= end) || (stepSize < 0 && currentSize <= end)) {
+          currentSize = end; // Ensure precise final value
+          clearInterval(animationInterval);
+      }
+
+      $(".gridr").css("grid-template-columns", `repeat(auto-fill, minmax(${currentSize}px, 1fr))`);
+  }
+
+  let animationInterval = setInterval(step, stepInterval);
+}
+
 function enableDisableGraphicsOptions(gameShortName) {
   if ($("#override-graphics").prop("checked")) {
     tempConfig[gameShortName]['gfx_mode'] = $("#gfx_mode").val();
@@ -865,7 +915,8 @@ function drawCategories() {
 function drawGameInfo(gameId) {
   selectedGame = gameId;
   let category = gameData[gameId]['category'];
-  let imagePath = __dirname+`/boxart/${category}/${gameId}.jpg`;
+  boxartId = gameId.replace(":", "_");
+  let imagePath = __dirname+`/boxart/${boxartId}.jpg`;
   try {
     fs.accessSync(imagePath, fs.constants.R_OK);
   } catch(err) {
@@ -1147,6 +1198,10 @@ function detectGame(gamePath) {
     const versionText = completeGameName.replace(/.*\(([^()]+)\)$/, '$1');
     if (gameId.includes(":")) {
       let boxart = gameId.replace(":","_");
+      if (!gameData.hasOwnProperty(gameId)) {
+        alert("Unknown error: gameId = "+gameId);
+        return;
+      }
       let category = gameData[gameId]['category'];
       let imagePath = __dirname+`/boxart/${boxart}.jpg`;
       try {

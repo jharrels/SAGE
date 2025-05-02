@@ -10,10 +10,10 @@
 <br />
 <p align="center">
   <a href="https://github.com/jharrels/SAGE">
-    <img src="https://j-topia.com/images/scummy_logo.png" alt="Logo" width="100" height="100">
+    <img src="https://j-topia.com/images/sage_logo.png" alt="Logo" width="256" height="256">
   </a>
 
-  <h3 align="center">SAGE</h3><h4>(System for Aggregating Game Engines)</h4>
+  <h3 align="center">SAGE</h3><h4 align="center">(System for Aggregating Game Engines)</h4>
 
   <p align="center">
     A modern, clean front-end for SCUMMVM.

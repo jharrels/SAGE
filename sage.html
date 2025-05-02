@@ -23,28 +23,48 @@
         CATEGORIES
       </div>
     </div>
+    <div class="menuButton bright" id="add-game">
+      <i class="fas fa-plus fa-fw"></i>
+    </div>
     <div class="menuButton bright" id="scummy-configure">
       <i class="fas fa-cog fa-fw"></i>
     </div>
+    <div class="menuButton bright" id="scummy-view-options">
+      <i class="fas fa-chevron-right fa-fw"></i>
+    </div>
   </div>
   <div class="leftMenuBar">
-    <div class="menuButton" id="add-game">
-      <i class="fas fa-plus fa-fw"></i>
-    </div>
     <!--<div class="menuButton">
       <i class="fas fa-search fa-fw"></i>
     </div>-->
   </div>
-  <div class="rightMenuBar">
-    <div class="menuButton" id="group-items">
-      <i class="fas fa-object-group fa-fw"></i>
-    </div><div class="menuButton no-right-radius no-right-margin" id="list-view">
-      <i class="fas fa-th-list fa-fw"></i>
-    </div><div class="menuButton no-left-radius no-left-margin" id="grid-view">
-      <i class="fas fa-th-large fa-fw"></i>
-    </div>
-  </div>
   <div class="main">
+  </div>
+  <div id="view-menu">
+    <div class="view-option">
+      <p>Group</p>
+      <div class="menuButton" id="group-items">
+        <i class="fas fa-object-group fa-fw"></i>
+      </div>
+    </div>
+    <div class="view-option">
+      <p>View List As...</p>
+      <div class="menuButton no-right-radius no-right-margin" id="list-view">
+        <i class="fas fa-th-list fa-fw"></i>
+      </div><div class="menuButton no-left-radius no-left-margin" id="grid-view">
+        <i class="fas fa-th-large fa-fw"></i>
+      </div>
+    </div>
+    <div class="view-option">
+      <p>Box Size</p>
+      <input type="range" min="100" max="250" step="25" id="box-size">
+      <div class="slider-labels">
+        <span>Small</span>
+        <span></span>
+        <span></span>
+        <span>Large</span>
+    </div>
+    </div>
   </div>
   <div id="context-menu">
     <div class="launch-items">
@@ -207,7 +227,7 @@
           Welcome!
         </div>
         <div class="modal-option">
-          Welcome to Scummy, a front-end for SCUMMVM.<br><br>Before using Scummy, you'll need to configure a couple of options.
+          Welcome to Sage, a front-end for SCUMMVM.<br><br>Before using Sage, you'll need to configure a couple of options.
         </div>
       </div>
       <div class="modal-footer">
