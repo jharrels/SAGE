@@ -75,6 +75,18 @@ checkInitState();
    HANDLE GUI EVENTS, SUCH AS CLICKING AND MOVING THE MOUSE
 ---------------------------------------------------------------------------- */
 
+$("#gui-show-title").on("click", () => {
+  scummyConfig["showTitles"] = $("#gui-show-title").prop("checked");
+  store.set('scummyConfig', scummyConfig);
+  drawGames();
+});
+
+$("#gui-show-favorite-icon").on("click", () => {
+  scummyConfig["showFavoriteIcon"] = $("#gui-show-favorite-icon").prop("checked");
+  store.set('scummyConfig', scummyConfig);
+  drawGames();
+});
+
 $("#init-next-1").on("click", () => {
   hideModal("#scummy-init-modal-1");
   showModal("#scummy-init-modal-2");
@@ -378,6 +390,8 @@ $(".sideBar").on("click", ".sideBarItem", function(e) {
 
 $("#scummy-view-options").on("click", function() {
   if (!$("#view-menu").hasClass("view-menu-visible")) {
+    $("#gui-show-title").prop("checked", scummyConfig['showTitles']);
+    $("#gui-show-favorite-icon").prop("checked", scummyConfig['showFavoriteIcon']);
     $("#view-menu").addClass("view-menu-visible");
     let buttonIcon = $("<i></i>", {"class": "fas fa-chevron-left fa-fw"});
     $("#scummy-view-options").html(buttonIcon);
@@ -402,8 +416,6 @@ $("#scummy-configure").on("click", function() {
   $("#scummvm-config-error").hide();
   $("#scummvm-executable-path").html(scummyConfig['scummvmPath']);
   $("#scummvm-configuration-path").html(scummyConfig['scummvmConfigPath']);
-  $("#gui-show-title").prop("checked", scummyConfig['showTitles']);
-  $("#gui-show-favorite-icon").prop("checked", scummyConfig['showFavoriteIcon']);
   $("#gui-show-categories").prop("checked", scummyConfig['showCategories']);
   $("#gui-show-recents").prop("checked", scummyConfig['showRecentCategory']);
   $("#gui-max-recents").val(scummyConfig['recentMax']);
@@ -1081,7 +1093,7 @@ function drawGameList(gameList, listId=1) {
         if (favorites.includes(longNames[key])) favoriteObj = $("<i></i>", {"class": "fas fa-heart fa-fw favorite-pink"}).append(" ");
       }
       let gameNameObj;
-      if (scummyConfig['showTitles']) gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
+      if ((scummyConfig['showTitles']) || (listMode == "list")) gameNameObj = $("<span></span>").html(key).prepend(favoriteObj);
       let sdefault = defaultVersion[longNames[key]];
       let rowObj = $("<div></div>", {"class": "game", "id": longNames[key], "data-id": key, "data-version": sdefault}).append(gameImageObj).append(gameNameObj);
       $("#listContainer"+listId.toString()).append(rowObj);

@@ -110,8 +110,7 @@ html {
 #scummy-configure {
   position: absolute;
   bottom: 30px;
-
-  left: 50%;
+  left: 57%;
   transform: translateX(-50%);
   display: inline-block;
 }
@@ -158,6 +157,10 @@ html {
   margin: auto 5px;
   transition: background-color 0.25s, color 0.25s;
   font-family: sans-serif;
+}
+
+.menuButton.noMargin {
+  margin: auto 0;
 }
 
 .menuButton.wide {
@@ -517,6 +520,11 @@ Scrollbars
   text-shadow: 0px 0px 8px rgba(27, 39, 45, 1), 0px 0px 8px rgba(27, 39, 45, 1);
 }
 
+span.left-justify {
+  display: block;
+  text-align: left;
+}
+
 #view-menu {
   display: inline-block;
   position: absolute;
@@ -541,8 +549,9 @@ Scrollbars
 
 .view-option {
   display: inline-block;
+  top:0px;
   text-align: center;
-  font-size: 1.2em;
+  font-size: 1.0em;
   font-family: sans-serif;
   color: white;
   margin-right: 40px;
