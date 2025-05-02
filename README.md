@@ -58,7 +58,7 @@
 <!-- ABOUT THE PROJECT -->
 ## What is SAGE?
 
-[![SAGE][scummy-gallery]](https://j-topia.com/images/scummy_gallery.png)
+[![SAGE][sage-gallery]](https://j-topia.com/images/sage_gallery.png)
 
 SAGE is a well designed, clean, and modern front-end for SCUMMVM. For those who aren't familiar, SCUMMVM is an application which allow you to run classic graphic adventure and roleplaying games on modern systems. It is a fantastic application that has given many a chance to relive their childhood favorites, with minimal fuss.
 
@@ -122,6 +122,7 @@ Version 1.0 of SAGE will be able to do everything SCUMMVM can do plus a few extr
 * **0.10.0** - ~~GUI configuration options for Scummy.~~ :heavy_check_mark:
 * **0.11.0** - ~~Get automated builds working.~~ :heavy_check_mark:
 * **1.0.0** - ~~Release.~~ :heavy_check_mark:
+* **1.1.0** - Scummy becomes SAGE. Add compatibility to ScummVM 2.9.0, missing box art.
 
 Planned features:
 * Organize games into player-made collections (for example: RPGs, Monkey Island, King's Quest, etc).
@@ -132,7 +133,7 @@ Planned features:
 * Themes.
 * Add additional game options.
 * Add SCUMMVM configuration options.
-* Add compatibility for Mac and Linux.
+* Add compatibility for Mac.
 
 See the [open issues](https://github.com/jharrels/SAGE/issues) for a list of proposed features (and known issues).
 
@@ -179,16 +180,16 @@ Project Link: [https://github.com/jharrels/SAGE](https://github.com/jharrels/SAG
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/jharrels/scummy.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/jharrels/SAGE.svg?style=for-the-badge
 [contributors-url]: https://github.com/jharrels/SAGE/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/jharrels/scummy.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/jharrels/SAGE.svg?style=for-the-badge
 [forks-url]: https://github.com/jharrels/SAGE/network/members
-[stars-shield]: https://img.shields.io/github/stars/jharrels/scummy.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/jharrels/SAGE.svg?style=for-the-badge
 [stars-url]: https://github.com/jharrels/SAGE/stargazers
-[issues-shield]: https://img.shields.io/github/issues/jharrels/scummy.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/jharrels/SAGE.svg?style=for-the-badge
 [issues-url]: https://github.com/jharrels/SAGE/issues
-[license-shield]: https://img.shields.io/github/license/jharrels/scummy.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/jharrels/SAGE.svg?style=for-the-badge
 [license-url]: https://github.com/jharrels/SAGE/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/justin-harrelson-a7b18549
-[scummy-gallery]: https://j-topia.com/images/scummy_gallery.png
+[sage-gallery]: https://j-topia.com/images/sage_gallery.png

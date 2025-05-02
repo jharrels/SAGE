@@ -23,13 +23,13 @@
         CATEGORIES
       </div>
     </div>
-    <div class="menuButton bright" id="add-game">
+    <div class="menuButton bright wide" id="add-game">
       <i class="fas fa-plus fa-fw"></i>
     </div>
     <div class="menuButton bright" id="scummy-configure">
       <i class="fas fa-cog fa-fw"></i>
     </div>
-    <div class="menuButton bright" id="scummy-view-options">
+    <div class="menuButton bright noMargin" id="scummy-view-options">
       <i class="fas fa-chevron-right fa-fw"></i>
     </div>
   </div>
@@ -57,13 +57,18 @@
     </div>
     <div class="view-option">
       <p>Box Size</p>
-      <input type="range" min="100" max="250" step="25" id="box-size">
+      <input type="range" min="100" max="250" step="50" id="box-size">
       <div class="slider-labels">
         <span>Small</span>
         <span></span>
         <span></span>
         <span>Large</span>
+      </div>
     </div>
+    <div class="view-option">
+      <p>Library Options</p>
+      <span class="left-justify"><input type="checkbox" id="gui-show-title"> Display title under box art<br>
+      <input type="checkbox" id="gui-show-favorite-icon"> Display favorite icon on titles</span>
     </div>
   </div>
   <div id="context-menu">
@@ -168,20 +173,6 @@
   <div class="modal" id="scummy-configure-modal">
     <div class="modal-wrapper">
       <div class="modal-body">
-        <div class="modal-option-category graphics-options-header">
-          General
-        </div>
-        <div class="modal-option">
-          <input type="checkbox" id="gui-show-favorite-icon"> Display favorite icon on titles
-        </div>
-        <hr>
-        <div class="modal-option-category engine-options-header">
-          Gallery View
-        </div>
-        <div class="modal-option">
-          <input type="checkbox" id="gui-show-title"> Display title under box art
-        </div>
-        <hr>
         <div class="modal-option-category graphics-options-header">
           Side Bar
         </div>
