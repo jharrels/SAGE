@@ -58,9 +58,11 @@
 <!-- ABOUT THE PROJECT -->
 ## What is SAGE?
 
-[![SAGE][sage-gallery]](https://j-topia.com/images/sage_gallery.png)
+[![SAGE][sage-gallery]](https://j-topia.com/images/sage_gallery.jpg)
 
-SAGE is a well designed, clean, and modern front-end for SCUMMVM. For those who aren't familiar, SCUMMVM is an application which allow you to run classic graphic adventure and roleplaying games on modern systems. It is a fantastic application that has given many a chance to relive their childhood favorites, with minimal fuss.
+SAGE is a well designed, clean, and modern front-end for SCUMMVM. For those who aren't familiar, SCUMMVM is an application which allow you to run classic graphic adventure and roleplaying games on modern systems. It is a fantastic application that has given many a chance to relive their childhood favorites, with minimal fuss. Scummy (or SAGE, as it is now called) automatically reads the ScummVM configuration and presents the gamelist in, what we hope, is a much nicer format. You can add games directly through SAGE, install alternate versions, set your default version, set favorites, and more.
+
+This project was shelved for four years as it seemed like the ScummVM team, in 2021, was about to introduce something native that did exactly the same thing. However, this never came to pass, so this project has been restarted as of May 2025.
 
 A list of resources that I find helpful are listed in the acknowledgements.
 
@@ -192,4 +194,4 @@ Project Link: [https://github.com/jharrels/SAGE](https://github.com/jharrels/SAG
 [license-url]: https://github.com/jharrels/SAGE/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/justin-harrelson-a7b18549
-[sage-gallery]: https://j-topia.com/images/sage_gallery.png
+[sage-gallery]: https://j-topia.com/images/sage_gallery.jpg
