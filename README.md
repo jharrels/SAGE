@@ -109,24 +109,7 @@ This is an example of how to list things you need to use the software and how to
 
 
 
-<!-- ROADMAP -->
-## Roadmap
-Version 1.0 of SAGE will be able to do everything SCUMMVM can do plus a few extras:
-* **0.1.0** - ~~Obtain a list of installed games.~~ :heavy_check_mark:
-* **0.2.0** - ~~Display the list of installed games using either a grid view or a list view.~~ :heavy_check_mark:
-* **0.3.0** - ~~Install games via Scummy, including detecting an uninstalled game or a new version of an installed game.~~ :heavy_check_mark:
-* **0.4.0** - ~~Ability to configure options for installed games.~~ :heavy_check_mark:
-* **0.5.0** - ~~Launch games, including different versions of games.~~ :heavy_check_mark:
-* **0.6.0** - ~~Remove installed games.~~ :heavy_check_mark:
-* **0.7.0** - ~~Favoriting of games.~~ :heavy_check_mark:
-* **0.8.0** - ~~Set default games.~~ :heavy_check_mark:
-* **0.9.0** - ~~Display options for displaying recently played, all games, favorited games, and games by category (ie. LucasArts, Sierra, Delphine Software, etc).~~ :heavy_check_mark:
-* **0.10.0** - ~~GUI configuration options for Scummy.~~ :heavy_check_mark:
-* **0.11.0** - ~~Get automated builds working.~~ :heavy_check_mark:
-* **1.0.0** - ~~Release.~~ :heavy_check_mark:
-* **1.1.0** - Scummy becomes SAGE. Add compatibility to ScummVM 2.9.0, missing box art.
-
-Planned features:
+## Planned features:
 * Organize games into player-made collections (for example: RPGs, Monkey Island, King's Quest, etc).
 * Launch other applications before launching the game. Useful for setting up other devices, such as virtual drives or MT-32 emulation.
 * Search function.
