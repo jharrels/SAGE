@@ -2,13 +2,9 @@ const { dialog } = require('electron').remote;
 const path = require('path');
 const os = require('os');
 const fs = require('fs')
-const { remote } = require('electron')
-const app = remote.app
-const { Menu, MenuItem } = remote
-const electron = require('electron');
+const { remote, ipcRenderer } = require('electron')
 const { spawn } = require('child_process');
 const ini = require('ini');
-
 const electronScreen = require('electron').screen;
 const Store = require('electron-store');
 const store = new Store();
@@ -111,12 +107,12 @@ $("#init-next-2").on("click", () => {
   $("#init-scummvm-config-path").html(tempPath);
 });
 
-$("#init-next-3").on("click", () => {
+$("#init-next-3").on("click",  async () => {
   hideModal("#scummy-init-modal-3");
   scummyConfig['scummvmConfigPath'] = $("#init-scummvm-config-path").text();
   scummyConfig['scummvmPath'] = $("#init-scummvm-executable-path").text();
   store.set('scummyConfig', scummyConfig);
-  loadScummvmConfig();
+  await loadScummvmConfig();
   getInstalledGames();
   getAudioDevices();
   $(".sideBar").fadeIn(500, function() {
@@ -596,13 +592,15 @@ $("#scummy-configure-modal-save").on("click", () => {
 });
 
 
-$("#game-configure-modal-save").on("click", () => {
+$("#game-configure-modal-save").on("click", async () => {
   let shortName = selectedConfig;
   enableDisableGraphicsOptions(shortName);
   enableDisableAudioOptions(shortName);
   enableDisableVolumeOptions(shortName);
   scummvmConfig = JSON.parse(JSON.stringify(tempConfig));
-  fs.writeFileSync(scummyConfig['scummvmConfigPath'], ini.stringify(scummvmConfig));
+  await ipcRenderer.invoke('write-ini-config', 
+    scummyConfig['scummvmConfigPath'],
+    scummvmConfig);
   $("#game-configure-modal").fadeOut(250);
 });
 
@@ -1145,9 +1143,8 @@ function getScummvmConfigPath() {
   return scummvmConfigPath;
 }
 
-function loadScummvmConfig() {
-  let rawScummvmConfig = fs.readFileSync(scummyConfig['scummvmConfigPath'], 'utf-8');
-  scummvmConfig = ini.parse(rawScummvmConfig);
+async function loadScummvmConfig() {
+  scummvmConfig = await ipcRenderer.invoke('read-ini-config', scummyConfig['scummvmConfigPath']);
 }
 
 function showWaiting(gameName) {
@@ -1170,7 +1167,7 @@ function writeTempConfig(shortName) {
     let lineEnd;
     if (os.type() == 'Windows_NT') tempConfigPath = process.env.APPDATA+"\\Scummy\\temp.ini";
     if (os.type() == 'Darwin') tempConfigPath = process.env.HOME+"/Library/Preferences/Scummy";
-    if (os.type() == 'Linux') tempConfigPath = app.getPath(userData);
+    if (os.type() == 'Linux') tempConfigPath = os.tmpdir();
     tempConfig.push("[scummvm]");
     Object.keys(scummvmConfig['scummvm']).forEach(key => {
       tempConfig.push(`${key}=${scummvmConfig['scummvm'][key]}`);
@@ -1260,6 +1257,7 @@ function detectGame(gamePath) {
   })
 }
 
+
 function importGame(gamePath) {
   let launchOptions = ['--add', `--path="${gamePath}"`];
   let rawData = "";
@@ -1278,10 +1276,14 @@ function importGame(gamePath) {
   });
 
   scummvm.on('exit', (code) => {
-    loadScummvmConfig();
-    getInstalledGames();
-    drawGames();
+    afterImportGame();
   })
+}
+
+async function afterImportGame() {
+  await loadScummvmConfig();
+  getInstalledGames();
+  drawGames();
 }
 
 function getAudioDevices() {
@@ -1316,9 +1318,11 @@ function getAudioDevices() {
   })
 }
 
-function removeGame(configName) {
+async function removeGame(configName) {
   delete scummvmConfig[configName];
-  fs.writeFileSync(scummyConfig['scummvmConfigPath'], ini.stringify(scummvmConfig));
+  await ipcRenderer.invoke('write-ini-config', 
+                           scummyConfig['scummvmConfigPath'],
+                           scummvmConfig);
   getInstalledGames();
   drawGames();
   $("#game-info-close").trigger("click");
@@ -1362,7 +1366,7 @@ function showScummySetup() {
   showModal("#scummy-init-modal-1");
 }
 
-function checkInitState() {
+async function checkInitState() {
   if (scummyConfig['scummvmPath'] == "") {
     $(".sideBar").hide();
     $(".main").hide();
@@ -1370,15 +1374,14 @@ function checkInitState() {
     $(".rightMenuBar").hide();
     showScummySetup();
   } else {
-    loadScummvmConfig();
+    await loadScummvmConfig();
     getInstalledGames();
     getAudioDevices();
   }
 }
 
-function verifyScummvmConfigurationFile(configPath) {
-  let rawScummvmConfig = fs.readFileSync(configPath.toString(), 'utf-8');
-  let testScummvmConfig = ini.parse(rawScummvmConfig);
+async function verifyScummvmConfigurationFile(configPath) {
+  let testScummvmConfig = await ipcRenderer.invoke('read-ini-config', scummyConfig['scummvmConfigPath']);
   return (testScummvmConfig.hasOwnProperty("scummvm"));
 }
 
