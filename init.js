@@ -1,4 +1,6 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron');
+const fs = require('fs');
+const ini = require('ini');
 
 function createWindow () {
 
@@ -38,4 +40,15 @@ function createWindow () {
   // and load the index.html of the app.
   win.loadFile('sage.html')
 }
+
+ipcMain.handle('read-ini-config', async (event, filePath) => {
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
+  return ini.parse(fileContents);
+});
+
+ipcMain.handle('write-ini-config', async (event, filePath, newConfig) => {
+  fs.writeFileSync(filePath, ini.stringify(newConfig), 'utf-8');
+});
+
+
 app.whenReady().then(createWindow)
