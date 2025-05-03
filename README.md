@@ -171,6 +171,7 @@ Project Link: [https://github.com/jharrels/SAGE](https://github.com/jharrels/SAG
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 * [The SCUMMVM Team](https://scummvm.org)
+* [eXoScummVM](https://www.retro-exo.com/scummvm.html)
 * [Moby Games](https://www.mobygames.com)
 * [Font Awesome](https://fontawesome.com)
 * [Node.js](https://nodejs.org)
