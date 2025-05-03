@@ -4,7 +4,6 @@ const os = require('os');
 const fs = require('fs')
 const { remote, ipcRenderer } = require('electron')
 const { spawn } = require('child_process');
-const ini = require('ini');
 const electronScreen = require('electron').screen;
 const Store = require('electron-store');
 const store = new Store();
