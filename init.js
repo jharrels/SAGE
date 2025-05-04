@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('fs');
 const ini = require('ini');
 
@@ -48,6 +48,10 @@ ipcMain.handle('read-ini-config', async (event, filePath) => {
 
 ipcMain.handle('write-ini-config', async (event, filePath, newConfig) => {
   fs.writeFileSync(filePath, ini.stringify(newConfig), 'utf-8');
+});
+
+ipcMain.handle('show-dialog', async (event, options) => {
+  return await dialog.showOpenDialog(options);
 });
 
 

@@ -114,6 +114,7 @@ $("#init-next-3").on("click",  async () => {
   await loadScummvmConfig();
   getInstalledGames();
   getAudioDevices();
+  drawGames();
   $(".sideBar").fadeIn(500, function() {
     $(".leftMenuBar").fadeIn(500);
     $(".rightMenuBar").fadeIn(500, function() {
@@ -122,16 +123,17 @@ $("#init-next-3").on("click",  async () => {
   });
 });
 
-$("#change-scummvm-path").on("click", () => {
+$("#change-scummvm-path").on("click", async () => {
   $("#scummvm-executable-error").fadeOut(250);
-  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+  let tempPath = await ipcRenderer.invoke('show-dialog', {
       "title": "Locate the ScummVM executable",
       "message": "Locate the ScummVM executable.",
       "properties": [
         'openFile'
       ]
   })
-  if (tempPath) {
+  if (!tempPath.canceled) {
+    tempPath = tempPath['filePaths'][0];
     $("#scummvm-executable-path").html(tempPath);
     let launchOptions = ['--help'];
     let rawData = "";
@@ -162,16 +164,17 @@ $("#change-scummvm-path").on("click", () => {
   }
 });
 
-$("#change-scummvm-config-path").on("click", () => {
+$("#change-scummvm-config-path").on("click", async () => {
   $("#scummvm-config-error").fadeOut(250);
-  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+  let tempPath = await ipcRenderer.invoke('show-dialog', {
       "title": "Locate the ScummVM configuration file",
       "message": "Locate the ScummVM configuration file.",
       "properties": [
         'openFile'
       ]
   })
-  if (tempPath) {
+  if (!tempPath.canceled) {
+    tempPath = tempPath['filePaths'][0];
     $("#scummvm-configuration-path").html(tempPath);
     if (!verifyScummvmConfigurationFile(tempPath)) {
       $("#scummy-configure-modal-save").addClass("disabled-option");
@@ -180,16 +183,17 @@ $("#change-scummvm-config-path").on("click", () => {
   }
 });
 
-$("#init-scummvm-path").on("click", () => {
+$("#init-scummvm-path").on("click", async () => {
   $("#init-scummvm-executable-error").fadeOut(250);
-  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+  let tempPath = await ipcRenderer.invoke('show-dialog', {
       "title": "Locate the ScummVM executable",
       "message": "Locate the ScummVM executable.",
       "properties": [
         'openFile'
       ]
   })
-  if (tempPath) {
+  if (!tempPath.canceled) {
+    tempPath = tempPath['filePaths'][0];
     $("#init-scummvm-executable-path").html(tempPath);
     let launchOptions = ['--help'];
     let rawData = "";
@@ -221,16 +225,17 @@ $("#init-scummvm-path").on("click", () => {
   }
 });
 
-$("#init-choose-scummvm-config-path").on("click", () => {
+$("#init-choose-scummvm-config-path").on("click", async () => {
   $("#init-scummvm-config-error").fadeOut(250);
-  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+  let tempPath = await ipcRenderer.invoke('show-dialog', {
       "title": "Locate the ScummVM Configuration File",
       "message": "Locate the ScummVM Configuration File.",
       "properties": [
         'openFile'
       ]
   })
-  if (tempPath) {
+  if (!tempPath.canceled) {
+    tempPath = tempPath['filePaths'][0];
     $("#init-scummvm-config-path").html(tempPath);
     if (!verifyScummvmConfigurationFile(tempPath)) {
       $("#init-next-3").addClass("disabled-option");
@@ -241,16 +246,16 @@ $("#init-choose-scummvm-config-path").on("click", () => {
   }
 });
 
-$("#add-game").on("click", () => {
-  let addPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+$("#add-game").on("click", async () => {
+  let addPath = await ipcRenderer.invoke('show-dialog', {
       "title": "Add Game",
       "message": "Choose the directory containing the game to add.",
       "properties": [
         'openDirectory'
       ]
   })
-  if (addPath) {
-    detectGame(addPath[0]);
+  if (!addPath.canceled) {
+    detectGame(addPath['filePaths'][0]);
   }
 });
 
@@ -1380,7 +1385,7 @@ async function checkInitState() {
 }
 
 async function verifyScummvmConfigurationFile(configPath) {
-  let testScummvmConfig = await ipcRenderer.invoke('read-ini-config', scummyConfig['scummvmConfigPath']);
+  let testScummvmConfig = await ipcRenderer.invoke('read-ini-config', configPath);
   return (testScummvmConfig.hasOwnProperty("scummvm"));
 }
 
