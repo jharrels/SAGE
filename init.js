@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('fs');
 const ini = require('ini');
+const Store = require('electron-store');
+const store = new Store();
 
 function createWindow () {
 
@@ -54,5 +56,12 @@ ipcMain.handle('show-dialog', async (event, options) => {
   return await dialog.showOpenDialog(options);
 });
 
+ipcMain.handle('read-setting', async (event, settingName) => {
+  return await store.get(settingName);
+});
+
+ipcMain.on('write-setting', (event, settingName, settingValue) => {
+  store.set(settingName, settingValue);
+});
 
 app.whenReady().then(createWindow)
