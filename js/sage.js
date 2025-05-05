@@ -5,8 +5,6 @@ const fs = require('fs')
 const { remote, ipcRenderer } = require('electron')
 const { spawn } = require('child_process');
 const electronScreen = require('electron').screen;
-const Store = require('electron-store');
-const store = new Store();
 const customTitlebar = require('custom-electron-titlebar');
 
 var scummvmConfig = {};
@@ -36,35 +34,24 @@ gridObserver.observe(document.body, { childList: true, subtree: true });
 /* ----------------------------------------------------------------------------
    LOAD PREFS AND SETUP THE GUI AT LAUNCH
 ---------------------------------------------------------------------------- */
-var listMode = store.get('listMode');
-if (listMode === undefined) listMode = "grid";
-var groupItems = store.get('groupItems');
-if (groupItems === undefined) groupItems = false;
-var favorites = store.get('favorites');
-if (favorites === undefined) favorites = [];
-var defaultVersion = store.get('defaultVersion');
-if (defaultVersion === undefined) defaultVersion = {};
-var selectedCategory = store.get('selectedCategory');
-if (selectedCategory === undefined) selectedCategory = "all";
-var recentList = store.get('recentList');
-if (recentList === undefined) recentList = [];
-var scummyConfig = store.get('scummyConfig');
-if (scummyConfig === undefined) scummyConfig = {};
-var boxSize = store.get('boxSize');
-if (boxSize === undefined) boxSize = 200;
+var listMode;
+var groupItems;
+var favorites;
+var defaultVersion;
+var selectedCategory;
+var recentList;
+var scummyConfig;
+var boxSize;
+(async () => {
+  await getAppSettings();
+  $(`#${listMode}-view`).addClass("active");
+  if (groupItems) $("#group-items").addClass("active");
+  $("#box-size").val(boxSize);
 
-// Migrate settings to 1.1.0+
-if (listMode == "gallery") {
-  listMode = "grid";
-  store.set('listMode', listMode);
-}
+  parseScummyConfig();
+  checkInitState();  
+})();
 
-$(`#${listMode}-view`).addClass("active");
-if (groupItems) $("#group-items").addClass("active");
-$("#box-size").val(boxSize);
-
-parseScummyConfig();
-checkInitState();
 
 /* ----------------------------------------------------------------------------
    HANDLE GUI EVENTS, SUCH AS CLICKING AND MOVING THE MOUSE
@@ -72,13 +59,13 @@ checkInitState();
 
 $("#gui-show-title").on("click", () => {
   scummyConfig["showTitles"] = $("#gui-show-title").prop("checked");
-  store.set('scummyConfig', scummyConfig);
+  ipcRenderer.send('write-setting', 'scummyConfig', scummyConfig);
   drawGames();
 });
 
 $("#gui-show-favorite-icon").on("click", () => {
   scummyConfig["showFavoriteIcon"] = $("#gui-show-favorite-icon").prop("checked");
-  store.set('scummyConfig', scummyConfig);
+  ipcRenderer.send('write-setting', 'scummyConfig', scummyConfig);
   drawGames();
 });
 
@@ -110,7 +97,7 @@ $("#init-next-3").on("click",  async () => {
   hideModal("#scummy-init-modal-3");
   scummyConfig['scummvmConfigPath'] = $("#init-scummvm-config-path").text();
   scummyConfig['scummvmPath'] = $("#init-scummvm-executable-path").text();
-  store.set('scummyConfig', scummyConfig);
+  ipcRenderer.send('write-setting', 'scummyConfig', scummyConfig);
   await loadScummvmConfig();
   getInstalledGames();
   getAudioDevices();
@@ -260,7 +247,7 @@ $("#grid-view").on("click", () => {
     $("#list-view").removeClass("active");
     $("#grid-view").addClass("active");
     listMode = "grid";
-    store.set('listMode', listMode);
+    ipcRenderer.send('write-setting', 'listMode', listMode);
     drawGames();
   }
 });
@@ -270,7 +257,7 @@ $("#list-view").on("click", () => {
     $("#grid-view").removeClass("active");
     $("#list-view").addClass("active");
     listMode = "list";
-    store.set('listMode', listMode);
+    ipcRenderer.send('write-setting', 'listMode', listMode);
     drawGames();
   }
 });
@@ -279,12 +266,12 @@ $("#group-items").on("click", () => {
   if (!$("#group-items").hasClass("active")) {
     $("#group-items").addClass("active");
     groupItems = true;
-    store.set('groupItems', groupItems);
+    ipcRenderer.send('write-setting', 'groupItems', groupItems);
     drawGames();
   } else {
     $("#group-items").removeClass("active");
     groupItems = false;
-    store.set('groupItems', groupItems);
+    ipcRenderer.send('write-setting', 'groupItems', groupItems);
     drawGames();
   }
 });
@@ -299,7 +286,7 @@ $(".launch-config").on("click", ".default", function(e) {
   let configName = $(this).parent().data("version");
   selectedConfig = configName;
   defaultVersion[selectedGame] = configName;
-  store.set('defaultVersion', defaultVersion);
+  ipcRenderer.send('write-setting', 'defaultVersion', defaultVersion);
   drawGameInfo(selectedGame);
 });
 
@@ -342,7 +329,7 @@ $(".game-info-boxart").on("click", ".game-info-favorite", function(e) {
     favorites.push(selectedGame);
     $(`#${selectedGame}`).find("span").prepend("<i class='fas fa-heart fa-fw favorite-pink'></i>");
   }
-  store.set('favorites', favorites);
+  ipcRenderer.send('write-setting', 'favorites', favorites);
   $("#favorites").html(favorites.length);
 });
 
@@ -380,7 +367,7 @@ $(".sideBar").on("click", ".sideBarItem", function(e) {
   $(".sideBarItem").removeClass("selected");
   $(this).addClass("selected");
   selectedCategory = $(this).attr("id").split("-")[1];
-  store.set('selectedCategory', selectedCategory);
+  ipcRenderer.send('write-setting', 'selectedCategory', selectedCategory);
   drawGames();
 });
 
@@ -402,7 +389,7 @@ $("#box-size").on("input", function() {
   let minSize = $(this).val();
   animateGridSize(boxSize, minSize);
   boxSize = minSize;
-  store.set('boxSize', minSize);
+  ipcRenderer.send('write-setting', 'boxSize', minSize);
   $(".grid").css("grid-template-columns", `repeat(auto-fill, minmax(${minSize}px, 1fr))`);
 });
 
@@ -452,7 +439,7 @@ $("#context-menu").on("click", ".favorite", function(e) {
     favorites.push(selectedGame);
     $(`#${selectedGame}`).find("span").prepend("<i class='fas fa-heart fa-fw favorite-pink'></i>");
   }
-  store.set('favorites', favorites);
+  ipcRenderer.send('write-setting', 'favorites', favorites);
   $("#favorites").html(favorites.length);
   $("#context-menu").fadeOut(250);
 });
@@ -733,7 +720,7 @@ function launchGame(gameId, shortName) {
   if (lastPosition > -1) recentList.splice(lastPosition, 1);
   recentList.unshift(gameId);
   recentList.splice(scummyConfig['recentMax']);
-  store.set('recentList', recentList);
+  ipcRenderer.send('write-setting', 'recentList', recentList);
   if (selectedCategory == "recent") drawGames();
   let launchOptions = [];
   let installPath = scummvmConfig[shortName]['path'].split("\\").join("\\\\");
@@ -976,7 +963,7 @@ function drawGameInfo(gameId) {
 function drawGames() {
   $(".grid").remove();
   $(".list").remove();
-  $(".main").html("")
+  $(".main").html("");
   if (groupItems) {
     if (selectedCategory == "all") {
       let listId = 1;
@@ -1044,7 +1031,6 @@ function drawGames() {
     }
     
   }
-  
 }
 
 function drawGameList(gameList, listId=1) {
@@ -1132,7 +1118,7 @@ function updateDefaultVersions() {
       defaultVersion[key] = installed[key]['versions'][0]['versionShortName'];
     }
   });
-  store.set('defaultVersion', defaultVersion);
+  ipcRenderer.send('write-setting', 'defaultVersion', defaultVersion);
 }
 
 function getScummvmConfigPath() {
@@ -1346,7 +1332,7 @@ function saveScummyConfig() {
   scummyConfig["recentMax"] = $("#gui-max-recents").val();
   scummyConfig["scummvmPath"] = $("#scummvm-executable-path").text();
   scummyConfig["scummvmConfigPath"] = $("#scummvm-configuration-path").text();
-  store.set('scummyConfig', scummyConfig);
+  ipcRenderer.send('write-setting', 'scummyConfig', scummyConfig);
   if (scummyConfig["showCategories"]) {
     $("#sideBarCategories").fadeIn(250);
   } else {
@@ -1391,4 +1377,29 @@ function showModal(modalId) {
 
 function hideModal(modalId) {
   $(modalId).fadeOut(250);
+}
+
+async function getAppSettings() {
+  listMode = await ipcRenderer.invoke('read-setting', 'listMode');
+  if (listMode === undefined) listMode = "grid";
+  groupItems = await ipcRenderer.invoke('read-setting', 'groupItems');
+  if (groupItems === undefined) groupItems = false;
+  favorites = await ipcRenderer.invoke('read-setting', 'favorites');
+  if (favorites === undefined) favorites = [];
+  defaultVersion = await ipcRenderer.invoke('read-setting', 'defaultVersion');
+  if (defaultVersion === undefined) defaultVersion = {};
+  selectedCategory = await ipcRenderer.invoke('read-setting', 'selectedCategory');
+  if (selectedCategory === undefined) selectedCategory = "all";
+  recentList = await ipcRenderer.invoke('read-setting', 'recentList');
+  if (recentList === undefined) recentList = [];
+  scummyConfig = await ipcRenderer.invoke('read-setting', 'scummyConfig');
+  if (scummyConfig === undefined) scummyConfig = {};
+  boxSize = await ipcRenderer.invoke('read-setting', 'boxSize');
+  if (boxSize === undefined) boxSize = 200;
+
+  // Migrate settings to 1.1.0+
+  if (listMode == "gallery") {
+    listMode = "grid";
+    ipcRenderer.send('write-setting', 'listMode', listMode);
+  }
 }
