@@ -1,10 +1,8 @@
-const { dialog } = require('electron').remote;
 const path = require('path');
 const os = require('os');
 const fs = require('fs')
-const { remote, ipcRenderer } = require('electron')
+const { ipcRenderer } = require('electron')
 const { spawn } = require('child_process');
-const electronScreen = require('electron').screen;
 const customTitlebar = require('custom-electron-titlebar');
 
 var scummvmConfig = {};
