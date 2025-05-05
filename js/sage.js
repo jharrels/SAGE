@@ -3,7 +3,6 @@ const os = require('os');
 const fs = require('fs')
 const { ipcRenderer } = require('electron')
 const { spawn } = require('child_process');
-const customTitlebar = require('custom-electron-titlebar');
 
 var scummvmConfig = {};
 var scummyConfig = {};
@@ -14,14 +13,6 @@ var selectedGame = "";
 var selectedConfig = "";
 var importGamePath = "";
 var audioDevices = [];
-
-//Menu.setApplicationMenu(null);
-
-let titlebar = new customTitlebar.Titlebar({
-  backgroundColor: customTitlebar.Color.fromHex('#1B262C'),
-  menu: null,
-  overflow: "hidden"
-});
 
 const gridObserver = new MutationObserver(() => {
   $(".grid").css("grid-template-columns", `repeat(auto-fill, minmax(${ $("#box-size").val() }px, 1fr))`);
