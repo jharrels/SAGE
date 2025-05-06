@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="css/all.css" />
     <link rel="stylesheet" id="theme-css" href="css/sage.css" />
   </head>
+  <div id="title-bar">
+    <div id="drag-region"></div>
+    <button id="minimize">&#xE921;</button> <!-- Minimize -->
+    <button id="maximize">&#xE922;</button> <!-- Maximize -->
+    <button id="close">&#xE8BB;</button>
+  </div>
   <div class="sideBar">
     <div class="sideBarItem" id="category-recent">
       <i class="fas fa-clock fa-fw recent"></i>Recent
@@ -23,20 +29,21 @@
         CATEGORIES
       </div>
     </div>
-    <div class="menuButton bright wide" id="add-game">
-      <i class="fas fa-plus fa-fw"></i>
-    </div>
-    <div class="menuButton bright" id="scummy-configure">
-      <i class="fas fa-cog fa-fw"></i>
-    </div>
-    <div class="menuButton bright noMargin" id="scummy-view-options">
-      <i class="fas fa-chevron-right fa-fw"></i>
-    </div>
   </div>
   <div class="leftMenuBar">
-    <!--<div class="menuButton">
+    <div class="titleButton" id="add-game">
+      <i class="fas fa-plus fa-fw"></i>
+    </div>
+    <!--<div class="titleButton">
       <i class="fas fa-search fa-fw"></i>
     </div>-->
+    <div class="titleDivider"></div>
+    <div class="titleButton" id="scummy-view-options">
+      <i class="far fa-eye fa-fw"></i>
+    </div>
+    <div class="titleButton" id="scummy-configure">
+      <i class="fas fa-cog fa-fw"></i>
+    </div>
   </div>
   <div class="main">
   </div>
