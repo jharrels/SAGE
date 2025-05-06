@@ -3,6 +3,7 @@ const os = require('os');
 const fs = require('fs')
 const { ipcRenderer } = require('electron')
 const { spawn } = require('child_process');
+const platform = process.platform;
 
 var scummvmConfig = {};
 var scummyConfig = {};
@@ -13,6 +14,8 @@ var selectedGame = "";
 var selectedConfig = "";
 var importGamePath = "";
 var audioDevices = [];
+
+themeTitleBar(platform);
 
 const gridObserver = new MutationObserver(() => {
   $(".grid").css("grid-template-columns", `repeat(auto-fill, minmax(${ $("#box-size").val() }px, 1fr))`);
@@ -45,6 +48,17 @@ var boxSize;
 /* ----------------------------------------------------------------------------
    HANDLE GUI EVENTS, SUCH AS CLICKING AND MOVING THE MOUSE
 ---------------------------------------------------------------------------- */
+$("#close").on("click", function () {
+  ipcRenderer.send("window-action", "close");
+});
+
+$("#minimize").on("click", function () {
+  ipcRenderer.send("window-action", "minimize");
+});
+
+$("#maximize").on("click", function () {
+  ipcRenderer.send("window-action", "maximize");
+});
 
 $("#gui-show-title").on("click", () => {
   scummyConfig["showTitles"] = $("#gui-show-title").prop("checked");
@@ -219,6 +233,7 @@ $("#init-choose-scummvm-config-path").on("click", async () => {
 });
 
 $("#add-game").on("click", async () => {
+  $("#add-game").addClass("active");
   let addPath = await ipcRenderer.invoke('show-dialog', {
       "title": "Add Game",
       "message": "Choose the directory containing the game to add.",
@@ -229,6 +244,7 @@ $("#add-game").on("click", async () => {
   if (!addPath.canceled) {
     detectGame(addPath['filePaths'][0]);
   }
+  $("#add-game").removeClass("active");
 });
 
 $("#grid-view").on("click", () => {
@@ -366,11 +382,11 @@ $("#scummy-view-options").on("click", function() {
     $("#gui-show-favorite-icon").prop("checked", scummyConfig['showFavoriteIcon']);
     $("#view-menu").addClass("view-menu-visible");
     let buttonIcon = $("<i></i>", {"class": "fas fa-chevron-left fa-fw"});
-    $("#scummy-view-options").html(buttonIcon);
+    $("#scummy-view-options").addClass("active");
   } else {
     $("#view-menu").removeClass("view-menu-visible");
     let buttonIcon = $("<i></i>", {"class": "fas fa-chevron-right fa-fw"});
-    $("#scummy-view-options").html(buttonIcon);    
+    $("#scummy-view-options").removeClass("active");
   }
 });
 
@@ -383,6 +399,7 @@ $("#box-size").on("input", function() {
 });
 
 $("#scummy-configure").on("click", function() {
+  $("#scummy-configure").addClass("active");
   showModal("#scummy-configure-modal");
   $("#scummvm-executable-error").hide();
   $("#scummvm-config-error").hide();
@@ -560,11 +577,13 @@ $("#game-configure-modal-cancel").on("click", () => {
 
 $("#scummy-configure-modal-cancel").on("click", () => {
   $("#scummy-configure-modal").fadeOut(250);
+  $("#scummy-configure").removeClass("active");
 });
 
 $("#scummy-configure-modal-save").on("click", () => {
   saveScummyConfig();
   $("#scummy-configure-modal").fadeOut(250);
+  $("#scummy-configure").removeClass("active");
 });
 
 
@@ -1314,8 +1333,6 @@ function parseScummyConfig() {
 }
 
 function saveScummyConfig() {
-  scummyConfig["showTitles"] = $("#gui-show-title").prop("checked");
-  scummyConfig["showFavoriteIcon"] = $("#gui-show-favorite-icon").prop("checked");
   scummyConfig["showCategories"] = $("#gui-show-categories").prop("checked");
   scummyConfig["showRecentCategory"] = $("#gui-show-recents").prop("checked");
   scummyConfig["recentMax"] = $("#gui-max-recents").val();
@@ -1390,5 +1407,17 @@ async function getAppSettings() {
   if (listMode == "gallery") {
     listMode = "grid";
     ipcRenderer.send('write-setting', 'listMode', listMode);
+  }
+}
+
+function themeTitleBar(platform) {
+  if (platform.includes("win")) {
+    $("#close").html("&#xE8BB;"); // Segoe MDL2 Close
+    $("#minimize").html("&#xE921;"); // Segoe MDL2 Minimize
+    $("#maximize").html("&#xE922;"); // Segoe MDL2 Maximize
+  } else {
+    $("#close").html('<i class="fas fa-times"></i>'); // Font Awesome Close
+    $("#minimize").html('<i class="fas fa-window-minimize"></i>'); // Font Awesome Minimize
+    $("#maximize").html('<i class="far fa-window-maximize"></i>'); // Font Awesome Maximize
   }
 }

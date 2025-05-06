@@ -9,20 +9,52 @@ html {
     user-select:none;
 }
 
-.titlebar {
-  height: 30px !important;
+#title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background-color: #1B262C;
+  height: 30px;
+  padding: 0;
+  z-index: 4;
+  position: relative;
 }
 
-.container-after-titlebar {
-  inset: 30px 0px 0px !important;
-  position: absolute !important;
-  overflow: hidden !important;
+#drag-region {
+  flex-grow: 1;
+  height: 100%;
+  -webkit-app-region: drag;
+}
+
+button {
+  font-family: "Segoe MDL2 Assets";
+  line-height: 15px;
+  font-size: 12px;
+  background: none;
+  border: none;
+  color: white;
+  width: 48px;
+  height: 30px;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+button:focus {
+  outline: none;
+}
+
+button:hover {
+  background: #444;
+}
+
+button#close:hover {
+  background: #f00;
 }
 
 .sideBar {
   background-color: #1B262C;
   width: 300px;
-  height: 100%;
+  height: calc(100% - 30px);
+  margin-top: 30px;
   display: inline-block;
   position: absolute;
   top: 0;
@@ -107,43 +139,53 @@ html {
   margin-top: 30px;
 }
 
-#scummy-configure {
-  position: absolute;
-  bottom: 30px;
-  left: 57%;
-  transform: translateX(-50%);
-  display: inline-block;
-}
-
-#scummy-view-options {
-  position: absolute;
-  bottom: 30px;
-  right: 30px;
-  display: inline-block;
-}
-
-#add-game {
-  position: absolute;
-  bottom: 30px;
-  left: 30px;
-  display: inline-block;
-}
-
 .rightMenuBar {
   position: absolute;
   display: inline-block;
   right: 15px;
-  padding: 10px 20px;
+  padding: 3px 20px;
   z-index: 3;
 }
 
 .leftMenuBar {
   position: absolute;
-  display: inline-block;
+  display: flex;
   top: 0px;
   left: 305px;
-  padding: 10px 20px;
-  z-index: 3;
+  padding-top: 3px;
+  z-index: 4;
+}
+
+.titleDivider {
+  width: 1px;
+  height: 18px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 0 8px 0 3px;
+  align-self: center;
+}
+
+.titleButton {
+  font-size: 16px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1B262C;
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid #36464e;
+  height: 22px;
+  width: 60px;
+  transition: background-color 0.25s, color 0.25s;
+  -webkit-app-region: none;
+  margin-right: 5px;
+}
+
+.titleButton:hover {
+  background-color: #36464e;
+}
+
+.titleButton.active {
+  background-color:#0077ff;  
 }
 
 .menuButton {
@@ -528,14 +570,14 @@ span.left-justify {
 #view-menu {
   display: inline-block;
   position: absolute;
-  z-index: 5;
+  z-index: 3;
   padding: 30px 20px;
   width: calc(100vw - 300px);
   backdrop-filter: blur(10px);
   background-color: rgba(0,0,0,.80);
-  bottom: 0;
-  left: -100%;
-  transition: left 0.2s linear;
+  left: 300px;
+  top: -300px;
+  transition: top 0.2s linear;
 }
 
 #view-menu p {
@@ -544,7 +586,7 @@ span.left-justify {
 }
 
 .view-menu-visible {
-  left: 300px !important;
+  top: 30px !important;
 }
 
 .view-option {
