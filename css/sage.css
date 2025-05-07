@@ -806,7 +806,6 @@ hr {
 Dialog
 ----------------------------------------*/
 .modal {
-  background-color: rgba(27, 39, 45, 0.7);
   position: absolute;
   top: 0;
   left: 0;
@@ -828,21 +827,21 @@ Dialog
   padding: 0px 0px;
   position: absolute;
   display: inline-block;
-  width: 500px;
+  width: 800px;
   top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
   color: white;
   margin: auto;
-  background-color: rgba(27, 39, 45);
-  box-shadow: 0px 3px 8px 3px rgba(0,0,0,0.7);
+  background-color: rgba(0,0,0,.9);
+  backdrop-filter: blur(10px);
   border-radius: 5px;
 }
 
 .modal > .modal-wrapper > .modal-title {
+  display: inline-block;
   background-color: black;
   font-size: 1.1em;
-  text-align: center;
   color: #BBE1FA;
   font-weight: bold;
   font-family: sans-serif;
@@ -852,14 +851,12 @@ Dialog
 .modal > .modal-wrapper > .modal-body > .modal-boxart {
   display: inline-block;
   position: relative;
-  left: 50%;
-  margin-top: 30px;
-  transform: translateX(-50%);
+  margin: 30px 30px;
 }
 
 .modal > .modal-wrapper > .modal-body > .modal-boxart > img {
   border-radius: 3px;
-  height: 100px;
+  height: 318px;
   width: auto;
 }
 
@@ -867,11 +864,12 @@ Dialog
   font-size: 1.3em;
   color: white;
   font-family: sans-serif;
-  padding: 30px 30px;
-  text-align: center;
+  padding: 30px 30px 30px 0;
+  text-align: left;
 }
 
 .modal > .modal-wrapper > .modal-body {
+  display: flex;
   max-height: 70vh;
   overflow-y: scroll;
 }
