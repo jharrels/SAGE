@@ -567,7 +567,8 @@ $("#unknown-modal-close").on("click", () => {
 });
 
 $("#game-info-close").on("click", () => {
-  $("#game-info").fadeOut(250);
+  $("#game-info-modal").fadeOut(250);
+  drawGames();
 });
 
 $("#game-configure-modal-cancel").on("click", () => {
@@ -965,7 +966,7 @@ function drawGameInfo(gameId) {
 
   }
   $("#context-menu").fadeOut(250);
-  $("#game-info").fadeIn(250);
+  $("#game-info-modal").fadeIn(250);
 }
 
 function drawGames() {

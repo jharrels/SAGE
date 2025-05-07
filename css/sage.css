@@ -687,17 +687,19 @@ Game Details
 ----------------------------------------*/
 #game-info {
   position: absolute;
-  top: 0;
-  left: 300;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
   display: inline-block;
-  height: calc(100vh - 30px);
-  width: calc(100vw - 300px);
+  height: calc(70vh - 30px);
+  width: calc(70vw);
   overflow-y: scroll;
-  background: #1b262c;
+  background: rgba(0,0,0,.9);
+  backdrop-filter: blur(10px);
   padding: 30px 30px 30px 30px;
   box-sizing: border-box;
-  z-index: 3;
-  display: none;
+  z-index: 8;
+  border-radius: 5px;
 }
 
 .game-info-title {
