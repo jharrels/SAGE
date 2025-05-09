@@ -732,6 +732,9 @@ function volumeOverridden(gameShortName) {
 }
 
 function launchGame(gameId, shortName) {
+  console.log(installed);
+  console.log(shortName);
+  console.log(installed[gameId]["versions"][shortName]);
   let lastPosition = recentList.indexOf(gameId);
   if (lastPosition > -1) recentList.splice(lastPosition, 1);
   recentList.unshift(gameId);
@@ -739,11 +742,15 @@ function launchGame(gameId, shortName) {
   ipcRenderer.send('write-setting', 'recentList', recentList);
   if (selectedCategory == "recent") drawGames();
   let launchOptions = [];
-  let installPath = scummvmConfig[shortName]['path'].split("\\").join("\\\\");
-  let tempConfigPath = writeTempConfig(shortName);
-  launchOptions.push(`--config="${tempConfigPath}"`);
+  for (let i=0; i<installed[gameId]["versions"].length; i++) {
+    if (shortName == installed[gameId]["versions"][i]["versionShortName"]) {
+      const cleanPath = installed[gameId]["versions"][i]["path"].replace(/[\\/]$/, "");
+      launchOptions.push("-p");
+      launchOptions.push(`"${cleanPath}"`);
+    }
+  }
   launchOptions.push(gameId);
-  let rawData = "";
+  console.log(launchOptions);
   let scummvmFile = path.basename(scummyConfig['scummvmPath']);
   let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
   if (os.type() == 'Darwin') {
@@ -756,6 +763,7 @@ function launchGame(gameId, shortName) {
   });
 
   scummvm.stderr.on('data', (data) => {
+    console.log(data);
   });
 
   scummvm.on('exit', (code) => {
@@ -1108,12 +1116,13 @@ function getInstalledGames() {
       let gameName = scummvmConfig[key]['description'].replace(/\s\([^()]*\)$/, '');
       let versionText = scummvmConfig[key]['description'].replace(/.*\(([^()]+)\)$/, '$1');
       let gameId = scummvmConfig[key]['engineid']+":"+scummvmConfig[key]['gameid'];
+      let gamePath = scummvmConfig[key]['path'];
       if (gameId in installed) {
-        installed[gameId]['versions'].push({"version": versionText, "versionShortName": key});
+        installed[gameId]['versions'].push({"version": versionText, "versionShortName": key, "path": gamePath});
       } else {
         if (gameName.substr(0, 4) == "The ") gameName = gameName.substr(4) + ", The";
         installed[gameId] = {"name": gameName, "versions": []};
-        installed[gameId]['versions'].push({"version": versionText, "versionShortName": key});
+        installed[gameId]['versions'].push({"version": versionText, "versionShortName": key, "path": gamePath});
       }
     }
   }
@@ -1162,23 +1171,6 @@ function hideWaiting() {
   $(".waiting").fadeOut(500, () => {
     $(".waiting").remove();
   });
-}
-
-function writeTempConfig(shortName) {
-    let tempConfig = [];
-    let lineEnd;
-    if (os.type() == 'Windows_NT') tempConfigPath = process.env.APPDATA+"\\Scummy\\temp.ini";
-    if (os.type() == 'Darwin') tempConfigPath = process.env.HOME+"/Library/Preferences/Scummy";
-    if (os.type() == 'Linux') tempConfigPath = os.tmpdir();
-    tempConfig.push("[scummvm]");
-    Object.keys(scummvmConfig['scummvm']).forEach(key => {
-      tempConfig.push(`${key}=${scummvmConfig['scummvm'][key]}`);
-    });
-    Object.keys(scummvmConfig[shortName]).forEach(key => {
-      tempConfig.push(`${key}=${scummvmConfig[shortName][key]}`);
-    });
-    fs.writeFileSync(tempConfigPath, tempConfig.join("\n"), {encoding: "utf8"});
-    return tempConfigPath;
 }
 
 function detectGame(gamePath) {
