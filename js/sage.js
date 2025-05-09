@@ -120,10 +120,7 @@ $("#init-next-3").on("click", () => {
   getInstalledGames();
   getAudioDevices();
   $(".sideBar").fadeIn(500, function() {
-    $(".leftMenuBar").fadeIn(500);
-    $(".rightMenuBar").fadeIn(500, function() {
-      $(".main").fadeIn(500);
-    });
+    $(".main").fadeIn(500);
   });
 });
 
