@@ -92,6 +92,17 @@
       <i class="fas fa-heart fa-fw"></i> Favorite
     </div>
   </div>
+  <div class="modal" id="game-info-modal">
+    <div id="game-info">
+      <div class="menuButton bright" id="game-info-close">
+        <i class="fas fa-times fa-fw"></i>
+      </div>
+      <div class="game-info-wrapper">
+        <div class="game-info-boxart"></div>
+        <div class="launch-config"></div>
+      </div>
+    </div>
+  </div>
   <div class="modal" id="add-modal">
     <div class="modal-wrapper">
       <div class="modal-body">
@@ -126,7 +137,7 @@
     </div>
   </div>
   <div class="modal" id="unknown-modal">
-    <div class="modal-wrapper">
+    <div class="modal-wrapper modal-thin">
       <div class="modal-body">
         <div class="modal-boxart"></div>
         <div class="modal-message"></div>
@@ -137,7 +148,7 @@
     </div>
   </div>
   <div class="modal" id="game-configure-modal">
-    <div class="modal-wrapper">
+    <div class="modal-wrapper modal-thin">
       <div class="modal-body">
         <div class="modal-option-category engine-options-header">
           Engine Options
@@ -178,8 +189,8 @@
     </div>
   </div>
   <div class="modal" id="scummy-configure-modal">
-    <div class="modal-wrapper">
-      <div class="modal-body">
+    <div class="modal-wrapper modal-thin">
+      <div class="modal-body vertical-modal">
         <div class="modal-option-category graphics-options-header">
           Side Bar
         </div>
@@ -196,6 +207,15 @@
         <div class="modal-option">
           <table>
             <tr><td>Recently played games to remember</td><td><input type="range" min="5" max="30" id="gui-max-recents"><span id="gui-max-recents-text"></span></td></tr>
+          </table>
+        </div>
+        <hr>
+        <div class="modal-option-category graphics-options-header">
+          Themes
+        </div>
+        <div class="modal-option">
+          <table>
+            <tr><td>Theme</td><td><select id="theme"></select></td></tr>
           </table>
         </div>
         <hr>
@@ -219,7 +239,7 @@
     </div>
   </div>
   <div class="modal" id="scummy-init-modal-1">
-    <div class="modal-wrapper">
+    <div class="modal-wrapper modal-thin">
       <div class="modal-body">
         <div class="modal-option-category graphics-options-header">
           Welcome!
@@ -234,7 +254,7 @@
     </div>
   </div>
   <div class="modal" id="scummy-init-modal-2">
-    <div class="modal-wrapper">
+    <div class="modal-wrapper modal-thin">
       <div class="modal-body">
         <div class="modal-option-category graphics-options-header">
           Step 1 of 2: SCUMMVM Executable
@@ -252,7 +272,7 @@
     </div>
   </div>
   <div class="modal" id="scummy-init-modal-3">
-    <div class="modal-wrapper">
+    <div class="modal-wrapper modal-thin">
       <div class="modal-body">
         <div class="modal-option-category graphics-options-header">
           Step 2 of 2: SCUMMVM Configuration File
@@ -266,17 +286,6 @@
       </div>
       <div class="modal-footer">
         <div id="init-next-3" class="modal-button bright">Finish</i></div><div id="init-back-3" class="modal-button bright"><i class="fas fa-chevron-left"></i> Back</div>
-      </div>
-    </div>
-  </div>
-  <div class="modal" id="game-info-modal">
-    <div id="game-info">
-      <div class="menuButton bright" id="game-info-close">
-        <i class="fas fa-times fa-fw"></i>
-      </div>
-      <div class="game-info-wrapper">
-        <div class="game-info-boxart"></div>
-        <div class="launch-config"></div>
       </div>
     </div>
   </div>

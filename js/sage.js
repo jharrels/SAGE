@@ -41,6 +41,8 @@ var boxSize;
   $("#box-size").val(boxSize);
 
   parseScummyConfig();
+  switchTheme(currentTheme);
+  installedThemes = getThemeNames();
   checkInitState();  
 })();
 
@@ -48,6 +50,11 @@ var boxSize;
 /* ----------------------------------------------------------------------------
    HANDLE GUI EVENTS, SUCH AS CLICKING AND MOVING THE MOUSE
 ---------------------------------------------------------------------------- */
+$("#theme").on("change", function() {
+  let selectedTheme = $(this).val(); // Get selected theme
+  switchTheme(selectedTheme); // Apply theme dynamically
+});
+
 $("#close").on("click", function () {
   ipcRenderer.send("window-action", "close");
 });
@@ -401,6 +408,7 @@ $("#box-size").on("input", function() {
 $("#scummy-configure").on("click", function() {
   $("#scummy-configure").addClass("active");
   showModal("#scummy-configure-modal");
+  populateThemeDropdown(installedThemes, currentTheme);
   $("#scummvm-executable-error").hide();
   $("#scummvm-config-error").hide();
   $("#scummvm-executable-path").html(scummyConfig['scummvmPath']);
@@ -599,7 +607,6 @@ $("#game-configure-modal-save").on("click", async () => {
     scummvmConfig);
   $("#game-configure-modal").fadeOut(250);
 });
-
 
 /* ----------------------------------------------------------------------------
    FUNCTIONS
@@ -1403,6 +1410,8 @@ async function getAppSettings() {
   if (scummyConfig === undefined) scummyConfig = {};
   boxSize = await ipcRenderer.invoke('read-setting', 'boxSize');
   if (boxSize === undefined) boxSize = 200;
+  currentTheme = await ipcRenderer.invoke('read-setting', 'currentTheme');
+  if (currentTheme === undefined) currentTheme = "sage";
 
   // Migrate settings to 1.1.0+
   if (listMode == "gallery") {
@@ -1421,4 +1430,44 @@ function themeTitleBar(platform) {
     $("#minimize").html('<i class="fas fa-window-minimize"></i>'); // Font Awesome Minimize
     $("#maximize").html('<i class="far fa-window-maximize"></i>'); // Font Awesome Maximize
   }
+}
+
+function switchTheme(themeId) {
+  $("link[rel=stylesheet][data-theme]").remove();
+  $("<link>", {
+    rel: "stylesheet",
+    type: "text/css",
+    href: `themes/${themeId}/${themeId}.css`, 
+    "data-theme": "true" 
+  }).appendTo("head");
+  ipcRenderer.send('write-setting', 'currentTheme', themeId);
+  currentTheme = themeId;
+}
+
+function getThemeNames() {
+  const themesDir = path.join(__dirname, "themes");
+  let themes = [];
+
+  fs.readdirSync(themesDir).forEach((dir) => {
+    const infoPath = path.join(themesDir, dir, "info.json");
+
+    if (fs.existsSync(infoPath)) {
+      const data = JSON.parse(fs.readFileSync(infoPath, "utf8"));
+      themes.push({ displayName: data.name, folderName: dir });
+    }
+  });
+
+  return themes.sort((a, b) => a.displayName.localeCompare(b.displayName));
+}
+
+function populateThemeDropdown(themes, currentTheme) {
+  $("#theme").empty();
+  themes.forEach((theme) => {
+    let $option = $("<option>", {
+      value: theme.folderName, 
+      text: theme.displayName,
+      selected: theme.folderName === currentTheme,
+    });
+    $("#theme").append($option);
+  });
 }

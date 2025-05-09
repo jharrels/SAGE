@@ -1,6 +1,5 @@
 body,
 html {
-    background-color: #1b262c;
     margin: 0px;
     padding: 0px;
     height: 100%;
@@ -13,7 +12,6 @@ html {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  background-color: #1B262C;
   height: 30px;
   padding: 0;
   z-index: 4;
@@ -32,7 +30,6 @@ button {
   font-size: 12px;
   background: none;
   border: none;
-  color: white;
   width: 48px;
   height: 30px;
   transition: background-color 0.25s, color 0.25s;
@@ -42,16 +39,7 @@ button:focus {
   outline: none;
 }
 
-button:hover {
-  background: #444;
-}
-
-button#close:hover {
-  background: #f00;
-}
-
 .sideBar {
-  background-color: #1B262C;
   width: 300px;
   height: calc(100% - 30px);
   margin-top: 30px;
@@ -68,7 +56,6 @@ button#close:hover {
   padding: 5px 0;
   font-family: sans-serif;
   font-size: 17px;
-  color: white;
   opacity: 0.2;
 }
 
@@ -78,7 +65,6 @@ button#close:hover {
   padding: 5px 10px;
   font-family: sans-serif;
   font-size: 12px;
-  color: white;
   opacity: 0.8;
 }
 
@@ -94,28 +80,11 @@ button#close:hover {
   opacity: 1.0;
 }
 
-.sideBarItem.selected > i.bookmark {
-  color: #0a0;
-}
-
-.sideBarItem.selected > i.all {
-  color: #256fdd;
-}
-
-.sideBarItem.selected > i.favorites {
-  color: #f55;
-}
-
-.sideBarItem.selected > i.recent {
-  color: #e6ae1e;
-}
-
 .sideBarItem:hover > i {
   opacity: 1.0;
 }
 
 .sideBarItem:hover {
-  background-color: rgba(255, 255, 255, .1);
   border-radius: 3px;
 }
 
@@ -127,8 +96,6 @@ button#close:hover {
 .sideBarItem > .badge {
   display: inline-block;
   float: right;
-  background: white;
-  color: #1B262C;
   padding: 0 10px;
   border-radius: 20px;
   font-weight: bold;
@@ -159,7 +126,6 @@ button#close:hover {
 .titleDivider {
   width: 1px;
   height: 18px;
-  background-color: rgba(255, 255, 255, 0.1);
   margin: 0 8px 0 3px;
   align-self: center;
 }
@@ -170,22 +136,11 @@ button#close:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #1B262C;
-  color: rgba(255, 255, 255, 0.7);
-  border: 1px solid #36464e;
   height: 22px;
   width: 60px;
   transition: background-color 0.25s, color 0.25s;
   -webkit-app-region: none;
   margin-right: 5px;
-}
-
-.titleButton:hover {
-  background-color: #36464e;
-}
-
-.titleButton.active {
-  background-color:#0077ff;  
 }
 
 .menuButton {
@@ -194,8 +149,6 @@ button#close:hover {
   display: inline-block;
   padding: 5px 15px;
   text-align: center;
-  background-color: rgba(27, 39, 45, 0.7);
-  color: rgba(255,255,255,0.7);
   margin: auto 5px;
   transition: background-color 0.25s, color 0.25s;
   font-family: sans-serif;
@@ -209,77 +162,7 @@ button#close:hover {
   padding: 5px 30px;
 }
 
-.menuButton.bright {
-  background-color: rgba(47, 59, 65, 0.7);
-}
-
-.menuButton.default {
-  color: #cc0;
-  background-color: rgba(191, 191, 0, 0.0);
-  border: 1px solid #cc0;
-}
-
-.menuButton.default.active{
-  color: rgba(255,255,255,0.7);
-  background-color: rgba(191, 191, 0, 0.7);
-  border: 1px solid #cc0;
-}
-
-.menuButton.default.active:hover {
-  color: rgba(255,255,255);
-  background-color: rgba(191, 191, 0);
-  border: 1px solid #cc0;
-}
-
-.menuButton.default:hover {
-  color: #dd1;
-  background-color: rgba(191, 191, 0, 0.1);
-}
-
-
-.menuButton.bright:hover {
-  color: white;
-  background-color: rgba(57,69,75);
-}
-
-.menuButton.bright:active,
-.menuButton.bright-red:active,
-.menuButton.default:active {
-  color: rgba(47,59,65);
-  background-color: white;
-}
-
-.menuButton.bright-red {
-  background-color: rgba(225, 0, 0, 0.7);
-}
-
-.menuButton.bright-red:hover {
-  color: white;
-  background-color: rgba(225,0,0);
-}
-
-.menuButton.bright-green {
-  background-color: rgba(0, 225, 0, 0.7);
-}
-
-.menuButton.bright-green:hover {
-  color: white;
-  background-color: rgba(0,225,0);
-}
-
-.menuButton.active {
-  background-color: rgba(255,255,255,0.7);
-  color: rgba(27, 39, 45, 0.7);
-}
-
-.menuButton:hover {
-  color: #fff;
-  background-color: #1B262C;
-}
-
 .menuButton:active {
-  color: #1B262C;
-  background-color: #fff;
   transition: none;
 }
 
@@ -309,7 +192,6 @@ button#close:hover {
   height: calc(100vh - 30px);
   margin-left: 300px;
   overflow-y: scroll;
-  background: #BBE1FA;
   border-top-left-radius: 5px;
   padding: 30px 30px 30px 30px;
   box-sizing: border-box;
@@ -332,7 +214,6 @@ button#close:hover {
 
 .grid>div span {
   font-family: sans-serif;
-  color: #1B262C;
   font-size: .8em;
   width: 100%;
   font-weight: 600;
@@ -378,7 +259,6 @@ button#close:hover {
 
 .list>div {
   border-radius: 5px;
-  background: rgba(0,0,0,0.1);
   margin-bottom: 5px;
   padding: 3px;
   transition: all .25s;
@@ -396,7 +276,6 @@ button#close:hover {
   display: inline-block;
   font-size: 1em;
   font-family: sans-serif;
-  color: #1B262C;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -419,7 +298,6 @@ button#close:hover {
   filter: brightness(1.2) contrast(1.0);
   transition: all .25s;
   transform: scale(1.01, 1.01);
-  background: rgba(0,0,0,0.2);
 }
 
 .list>div.game:hover > img {
@@ -430,7 +308,6 @@ button#close:hover {
   filter: brightness(1.2) contrast(1.0);
   transition: all .25s;
   transform: scale(1.01, 1.01);
-  background: rgba(0,0,0,0.2);
 }
 
 .list>div.game.active > img {
@@ -454,7 +331,6 @@ button#close:hover {
   box-sizing: border-box;
   font-size: 40px;
   font-family: sans-serif;
-  color: #1B262C;
   margin-bottom: 10px;
   margin-top: 30px;
 }
@@ -487,7 +363,6 @@ Scrollbars
 }
 
 .main.hasScrollBar::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 10px 10px #1B262C;
     border: solid 3px transparent;
     border-radius: 20px;
     transition: box-shadow 0.25;
@@ -502,7 +377,6 @@ Scrollbars
 }
 
 .sideBar.hasScrollBar::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 10px 10px #ddd;
     border: solid 3px transparent;
     border-radius: 20px;
     transition: box-shadow 0.25;
@@ -517,14 +391,12 @@ Scrollbars
 }
 
 .modal-body.hasScrollBar::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 10px 10px #ddd;
     border: solid 3px transparent;
     border-radius: 20px;
     transition: box-shadow 0.25;
 }
 
 .waiting {
-  background-color: rgba(27, 39, 45, 0.7);
   position: absolute;
   top: 0;
   left: 300;
@@ -542,15 +414,12 @@ Scrollbars
   top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
-  color: white;
   margin: auto;
   text-align: center;
 }
 
 .waiting > .inner > i {
   font-size: 30px;
-  color: #BBE1FA;
-  text-shadow: 0px 0px 8px rgba(27, 39, 45, 1), 0px 0px 8px rgba(27, 39, 45, 1);
 }
 
 .waiting > .inner > span {
@@ -558,8 +427,6 @@ Scrollbars
   padding-left: 10px;
   font-family: sans-serif;
   font-size: 30px;
-  color: #fff;
-  text-shadow: 0px 0px 8px rgba(27, 39, 45, 1), 0px 0px 8px rgba(27, 39, 45, 1);
 }
 
 span.left-justify {
@@ -574,7 +441,6 @@ span.left-justify {
   padding: 30px 20px;
   width: calc(100vw - 300px);
   backdrop-filter: blur(10px);
-  background-color: rgba(0,0,0,.80);
   left: 300px;
   top: -300px;
   transition: top 0.2s linear;
@@ -595,7 +461,6 @@ span.left-justify {
   text-align: center;
   font-size: 1.0em;
   font-family: sans-serif;
-  color: white;
   margin-right: 40px;
 }
 
@@ -606,18 +471,15 @@ span.left-justify {
   padding: 5px 0;
   font-size: 12px;
   font-weight: bold;
-  color: gray;
 }
 
 #context-menu {
   display: inline-block;
   position: absolute;
-  background-color: rgba(27, 39, 45);
-  box-shadow: 0px 3px 8px 3px rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
   top: 0;
   left: 0;
   z-index: 5;
-  color: white;
   display: none;
   padding: 5px;
   border-radius: 5px;
@@ -634,49 +496,23 @@ span.left-justify {
 #context-menu > .play,
 #context-menu > .launch-items > .play {
   white-space: nowrap;
-  color: #0c0;
   transition: all .25s;
   margin-bottom: 5px;
 }
 
 #context-menu > .manage {
-  color: #ccc;
   transition: all .25s;
 }
 
 #context-menu > .favorite {
-  color: #f55;
   transition: all .25s;
 }
 
 #context-menu > .favorite.active {
-  color: #f55;
   transition: all .25s;
 }
 
-#context-menu > .play:hover,
-#context-menu > .launch-items > .play:hover {
-  background-color: #0c0;
-  color: rgba(27, 39, 45);
-}
-
-#context-menu > .manage:hover {
-  background-color: #ccc;
-  color: rgba(27, 39, 45);
-}
-
-#context-menu > .favorite:hover {
-  background-color: #f55;
-  color: rgba(27, 39, 45);
-}
-
-#context-menu > .favorite.active:hover {
-  background-color: #f55;
-  color: rgba(27, 39, 45);
-}
-
 #context-menu > .divider {
-  background-color: #000;
   border-radius: 5px;
   height: 2px;
   margin-bottom: 5px;
@@ -694,7 +530,6 @@ Game Details
   height: calc(70vh - 30px);
   width: calc(70vw);
   overflow-y: scroll;
-  background: rgba(0,0,0,.9);
   backdrop-filter: blur(10px);
   padding: 30px 30px 30px 30px;
   box-sizing: border-box;
@@ -706,7 +541,6 @@ Game Details
   box-sizing: border-box;
   font-size: 40px;
   font-family: sans-serif;
-  color: white;
   margin-bottom: 30px;
 }
 
@@ -744,7 +578,6 @@ Game Details
   font-size: 20px;
   font-weight: bold;
   font-family: sans-serif;
-  color: #BBE1FA;
 }
 
 .game-info-favorite {
@@ -753,9 +586,7 @@ Game Details
   display: inline-block;
   padding: 5px 15px;
   text-align: center;
-  border: 1px solid #f55;
   box-sizing: border-box;
-  color: #f55;
   width: 250px;
   margin: 10px 30px 0 0;
   font-family: sans-serif;
@@ -763,15 +594,11 @@ Game Details
 }
 
 .game-info-favorite:hover {
-  background-color: rgba(255, 96, 96, .1);
   transition: background-color 0.25s, color 0.25s;
 }
 
 .game-info-favorite:active,
 .game-info-favorite.active:active {
-  background-color: white !important;
-  color: rgba(27, 39, 45);
-  border: 1px solid white;
   transition: none;
 }
 
@@ -781,10 +608,7 @@ Game Details
   display: inline-block;
   padding: 5px 15px;
   text-align: center;
-  border: 1px solid #f55;
-  background-color: #f55;
   box-sizing: border-box;
-  color: #fff;
   width: 250px;
   margin: 10px 30px 0 0;
   font-family: sans-serif;
@@ -792,15 +616,12 @@ Game Details
 }
 
 .game-info-favorite.active:hover {
-  border: 1px solid #f77;
-  background-color: #f77;
   box-sizing: border-box;
   transition: background-color 0.25s, color 0.25s;
 }
 
 hr {
   opacity: 0.2;
-  border-top: 1px solid white;
   border-bottom: none;
 }
 
@@ -817,14 +638,6 @@ Dialog
   display: none;
 }
 
-.modal-body > hr {
-  margin-top: 30px;
-  margin-left: 10px;
-  opacity: 0.2;
-  border-top: 1px solid white;
-  border-bottom: none;
-}
-
 .modal > .modal-wrapper {
   padding: 0px 0px;
   position: absolute;
@@ -833,18 +646,18 @@ Dialog
   top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
-  color: white;
   margin: auto;
-  background-color: rgba(0,0,0,.9);
   backdrop-filter: blur(10px);
   border-radius: 5px;
 }
 
+.modal > .modal-thin {
+  width: 500px;
+}
+
 .modal > .modal-wrapper > .modal-title {
   display: inline-block;
-  background-color: black;
   font-size: 1.1em;
-  color: #BBE1FA;
   font-weight: bold;
   font-family: sans-serif;
   padding: 20px 30px;
@@ -864,7 +677,6 @@ Dialog
 
 .modal > .modal-wrapper > .modal-body > .modal-message {
   font-size: 1.3em;
-  color: white;
   font-family: sans-serif;
   padding: 30px 30px 30px 0;
   text-align: left;
@@ -872,6 +684,12 @@ Dialog
 
 .modal > .modal-wrapper > .modal-body {
   display: flex;
+  max-height: 70vh;
+  overflow-y: scroll;
+}
+
+.modal > .modal-wrapper > .vertical-modal {
+  display: inline-block !important;
   max-height: 70vh;
   overflow-y: scroll;
 }
@@ -893,7 +711,6 @@ Dialog
   width: 60px;
   padding: 10px 30px;
   font-size: 1em;
-  color: white;
   font-family: sans-serif;
   margin-left: 10px;
   text-align: center;
@@ -903,38 +720,12 @@ Dialog
 }
 
 .modal-button:active {
-  background-color: white;
-  color: rgba(27, 39, 45);
   transition: none;
-}
-
-
-.modal-button.dark {
-  background-color: rgba(07, 19, 25);
-}
-
-.modal-button.dark:hover {
-  background-color: rgba(17,29,35);
-}
-
-.modal-button.bright {
-  background-color: rgba(47, 59, 65);
-}
-
-.modal-button.bright:hover {
-  background-color: rgba(57, 69, 75);
-}
-
-.modal-button.dark:active,
-.modal-button.bright:active {
-  background-color: white;
-  color: rgba(27, 39, 45);
 }
 
 .modal-secondary {
   font-weight: bold;
   font-family: sans-serif;
-  color: #BBE1FA;
 }
 
 .modal-option-category {
@@ -942,14 +733,12 @@ Dialog
   font-size: 20px;
   font-weight: bold;
   font-family: sans-serif;
-  color: #BBE1FA;
 }
 
 .modal-option {
   margin: 10px 30px 0 30px;
   font-size: 16px;
   font-family: sans-serif;
-  color: white;
 }
 
 .modal-option.indent {
@@ -961,7 +750,6 @@ Dialog
   box-sizing: border-box;
   font-size: 16px;
   font-family: sans-serif;
-  color: white;
 }
 
 .modal-option  td {
@@ -990,10 +778,6 @@ Dialog
   pointer-events: none;
 }
 
-.config-error{
-  color: #f00;
-}
-
 .clear {
   clear: both;
 }
@@ -1007,16 +791,7 @@ Dialog
 
 .game-name > small {
   font-size: .5em;
-  color: #ccc;
   display: inline-block;
   margin: 10px 0 40px 0;
   width:100%;
-}
-
-.warning-color {
-  color: #ffa100;
-}
-
-.favorite-pink {
-  color: #f55;
 }
