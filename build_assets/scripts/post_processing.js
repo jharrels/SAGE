@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const AdmZip = require("adm-zip");
 
 const packageJson = require("../../package.json");
 const version = packageJson.version;
@@ -34,5 +35,18 @@ fs.readdirSync(buildPath).forEach((folder) => {
   if (fs.statSync(oldPath).isDirectory()) {
     fs.renameSync(oldPath, newPath);
     console.log(`Renamed: ${folder} -> ${newName}-${version}`);
+    fs.copyFileSync("CHANGELOG.md", path.join(newPath, "CHANGELOG.md"));
+    console.log(`Copied: CHANGELOG.md to ${newPath}`);
+    const zip = new AdmZip();
+    zip.addLocalFolder(newPath);
+    zip.writeZip(`${newPath}.zip`);
+    console.log(`Zipped: ${newPath}.zip`);
   }
 });
+
+function blockingTimeout(ms) {
+  const start = Date.now();
+  while (Date.now() - start < ms) {
+    // 🔥 Blocks execution until the time has passed
+  }
+}

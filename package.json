@@ -5,22 +5,22 @@
   "main": "init.js",
   "scripts": {
     "test": "electron .",
-    "pack:win": "electron-packager . SAGE  --executable-name 'SAGE-1.1.1' --app-version=1.1.1 --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=win32 --arch=x64,ia32 --icon=build_assets/icons/sage.ico --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='SAGE' && node build_assets/scripts/rename_builds.js",
-    "pack:mac": "electron-packager . SAGE  --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=darwin --arch=x64 --arch=arm64 --icon=build_assets/icons/scummy.icns --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='Scummy'",
-    "pack:linux": "electron-packager . SAGE  --executable-name 'SAGE-1.1.1' --app-version=1.1.1 --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=linux --arch=ia32,x64,arm64 --icon=build_assets/icons/sage_icon_1024.png --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='SAGE' && node build_assets/scripts/rename_builds.js",
-    "build": "npm run pack:win && npm run pack:linux",
-    "build:mac": "npm run pack:mac"
+    "pack:win": "electron-packager . SAGE  --executable-name 'SAGE-1.1.1' --app-version=1.1.1 --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=win32 --arch=x64,ia32 --icon=build_assets/icons/sage.ico --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='SAGE'",
+    "pack:mac": "electron-packager . SAGE --app-version=1.1.1 --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=darwin --arch=x64 --arch=arm64 --icon=build_assets/icons/scummy.icns --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='SAGE'",
+    "pack:linux": "electron-packager . SAGE  --executable-name 'SAGE-1.1.1' --app-version=1.1.1 --ignore=release-builds --ignore=build_assets --ignore=_original_box_art --overwrite --version-string.LegalCopyright='Created by Justin harrelson' --platform=linux --arch=ia32,x64,arm64 --icon=build_assets/icons/sage_icon_1024.png --prune=true --out=release-builds --version-string.CompanyName='Justin Harrelson' --version-string.FileDescription=CE --version-string.ProductName='SAGE'",
+    "build": "node build_assets/scripts/changelog.js && npm run pack:win && npm run pack:linux && node build_assets/scripts/post_processing.js",
+    "build:mac": "node build_assets/scripts/changelog.js && npm run pack:mac && node build_assets/scripts/post_processing.js"
   },
   "author": "Justin Harrelson",
   "license": "ISC",
   "dependencies": {
-    "custom-electron-titlebar": "^3.2.5",
     "electron-store": "^6.0.1",
     "electron-window-state": "^5.0.3",
     "ini": "^1.3.8",
     "jquery": "^3.5.1"
   },
   "devDependencies": {
+    "adm-zip": "^0.5.16",
     "electron": "^12.0.2",
     "electron-packager": "^15.2.0"
   }
