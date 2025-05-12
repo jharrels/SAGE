@@ -112,6 +112,15 @@ button:hover {
   background-color: #c52d0b;
 }
 
+.search-container input {
+  padding-left: 35px;
+  background: #f7e4a6;
+  color: black;
+  border-top: 1px solid black;
+  box-shadow: inset 0 1px 1px 1px rgba(0,0,0,.7);
+  border-bottom: 1px solid white;
+}
+
 .menuButton {
   background-color: #fbf1ce;
   color: #821d06;
@@ -377,6 +386,7 @@ input[type=range] {
   outline: none;
   border-top: 1px solid black;
   border-bottom: 1px solid white;
+  box-shadow: inset 0 1px 1px 1px rgba(0,0,0,.7);
   accent-color: #821d06;
 }
 

@@ -14,6 +14,8 @@ var selectedGame = "";
 var selectedConfig = "";
 var importGamePath = "";
 var audioDevices = [];
+var filter = ""
+var typingTimer;
 
 themeTitleBar(platform);
 
@@ -50,6 +52,22 @@ var boxSize;
 /* ----------------------------------------------------------------------------
    HANDLE GUI EVENTS, SUCH AS CLICKING AND MOVING THE MOUSE
 ---------------------------------------------------------------------------- */
+$("#scummy-search").on("keyup", function () {
+  filter = $("#scummy-search").val();
+  drawGames();
+  clearTimeout(typingTimer); // Reset timer
+  typingTimer = setTimeout(() => {
+    $("#scummy-search").trigger("blur");
+  }, 15000);
+})
+
+$("#scummy-search").on("focus", function () {
+  clearTimeout(typingTimer); // Reset timer
+  typingTimer = setTimeout(() => {
+    $("#scummy-search").trigger("blur");
+  }, 15000);
+})
+
 $("#theme").on("change", function() {
   let selectedTheme = $(this).val(); // Get selected theme
   switchTheme(selectedTheme); // Apply theme dynamically
@@ -991,22 +1009,44 @@ function drawGames() {
   if (groupItems) {
     if (selectedCategory == "all") {
       let listId = 1;
-      Object.keys(categories).sort().forEach(key => {
-        if (installedCategories[key]['count'] > 0) {
-          let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
-          if (listId == 1) groupHeader.addClass("first");
-          $(".main").append(groupHeader);
-          listId = drawGameList(installedCategories[key]['installed'], listId);
-        }
-      });
+      if (filter != "") {
+        Object.keys(categories).sort().forEach(key => {
+          let filteredItemsInCategory = 0;
+          for (let i=0; i<installedCategories[key]['installed'].length; i++) {
+            let gameId = installedCategories[key]['installed'][i];
+            if (installed[gameId]['name'].toLowerCase().includes(filter.toLowerCase())) {
+              filteredItemsInCategory++;
+            }
+          }
+          if ((installedCategories[key]['count'] > 0) && (filteredItemsInCategory > 0)) {
+            let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
+            if (listId == 1) groupHeader.addClass("first");
+            $(".main").append(groupHeader);
+            listId = drawGameList(installedCategories[key]['installed'], listId);
+          }
+        });
+      } else {
+        Object.keys(categories).sort().forEach(key => {
+          if (installedCategories[key]['count'] > 0) {
+            let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
+            if (listId == 1) groupHeader.addClass("first");
+            $(".main").append(groupHeader);
+            listId = drawGameList(installedCategories[key]['installed'], listId);
+          }
+        });
+      }
     }
     if (selectedCategory == "favorites") {
       let listId = 1;
       favoriteCategories = {};
       for (i=0; i<favorites.length; i++) {
+        let addKey = false;
+        if ((filter == "") || ((filter != "") && (installed[favorites[i]]["name"].toLowerCase().includes(filter.toLowerCase())))) addKey = true;
         categoryKey = gameData[favorites[i]]['category'];
-        if (!(categoryKey in favoriteCategories)) favoriteCategories[categoryKey] = [];
-        favoriteCategories[categoryKey].push(favorites[i]);
+        if (addKey) {
+          if (!(categoryKey in favoriteCategories)) favoriteCategories[categoryKey] = [];
+          favoriteCategories[categoryKey].push(favorites[i]);
+        }
       }
       Object.keys(favoriteCategories).sort().forEach(key => {
         let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
@@ -1018,11 +1058,23 @@ function drawGames() {
     if (selectedCategory == "recent") {
       let listId = 1;
       recentCategories = {};
-      for (i=0; i<recentList.length; i++) {
-        if (recentList[i] in installed) {
-          categoryKey = gameData[recentList[i]]['category'];
-          if (!(categoryKey in recentCategories)) recentCategories[categoryKey] = [];
-          recentCategories[categoryKey].push(recentList[i]);
+      if (filter == "") {
+        for (i=0; i<recentList.length; i++) {
+          if (recentList[i] in installed) {
+            categoryKey = gameData[recentList[i]]['category'];
+            let filteredGamesInCategory = false;
+            if (!(categoryKey in recentCategories)) recentCategories[categoryKey] = [];
+            recentCategories[categoryKey].push(recentList[i]);
+          }
+        }
+      } else {
+        for (i=0; i<recentList.length; i++) {
+          if ((recentList[i] in installed) && (installed[recentList[i]]['name'].toLowerCase().includes(filter.toLowerCase()))) {
+            categoryKey = gameData[recentList[i]]['category'];
+            let filteredGamesInCategory = false;
+            if (!(categoryKey in recentCategories)) recentCategories[categoryKey] = [];
+            recentCategories[categoryKey].push(recentList[i]);
+          }
         }
       }
       Object.keys(recentCategories).sort().forEach(key => {
@@ -1033,10 +1085,18 @@ function drawGames() {
       });
     } 
     if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
+      console.log("yo");
       listId = 1;
       let categoryList = {};
       Object.keys(installed).forEach(key => {
-        if (selectedCategory == gameData[key]['category']) categoryList[installed[key]['name']] = key;
+        if (filter == "") {
+          if (selectedCategory == gameData[key]['category']) categoryList[installed[key]['name']] = key;
+        } else {
+          if ((selectedCategory == gameData[key]['category']) && (installed[key]['name'].toLowerCase().includes(filter.toLowerCase()))) {
+            console.log("yo");
+            categoryList[installed[key]['name']] = key;
+          }
+        }
       });
       let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[selectedCategory]);
       if (listId == 1) groupHeader.addClass("first");
@@ -1047,7 +1107,14 @@ function drawGames() {
     if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
       let categoryList = {};
       Object.keys(installed).forEach(key => {
-        if (selectedCategory == gameData[key]['category']) categoryList[installed[key]['name']] = key;
+        if (filter == "") {
+          if (selectedCategory == gameData[key]['category']) categoryList[installed[key]['name']] = key;
+        } else {
+          if ((selectedCategory == gameData[key]['category']) && (installed[key]['name'].toLowerCase().includes(filter.toLowerCase()))) {
+            console.log("yo");
+            categoryList[installed[key]['name']] = key;
+          }
+        }
       });
       listId = drawGameList(categoryList);
     } else {
@@ -1061,20 +1128,41 @@ function drawGameList(gameList, listId=1) {
   let longNames = {};
   if (selectedCategory == "recent") {
     recentList.forEach(key => {
-      if (gameList.includes(key)) {
-        longNames[installed[key]['name']] = key;
+      if (filter == "") {
+        if (gameList.includes(key)) {
+          longNames[installed[key]['name']] = key;
+        }
+      } else {
+        if ((gameList.includes(key) && (installed[key]['name'].toLowerCase().includes(filter.toLowerCase())))) {
+          longNames[installed[key]['name']] = key;
+        }
       }
     });
   }
   if (selectedCategory == "all") {
-    gameList.forEach(gameId => {
-      longNames[installed[gameId]['name']] = gameId;
-    });
+    if (filter != "") {
+      gameList.forEach(gameId => {
+        if (installed[gameId]['name'].toLowerCase().includes(filter.toLowerCase())) {
+          longNames[installed[gameId]['name']] = gameId;
+        }  
+      });
+    } else {
+      gameList.forEach(gameId => {
+        longNames[installed[gameId]['name']] = gameId;
+      });
+
+    }
   }
   if (selectedCategory == "favorites") {
     favorites.forEach(gameId => {
-      if (gameList.includes(gameId)) {
-        longNames[installed[gameId]['name']] = gameId;
+      if (filter == "") {
+        if (gameList.includes(gameId)) {
+          longNames[installed[gameId]['name']] = gameId;
+        }
+      } else {
+        if ((gameList.includes(gameId) && (installed[gameId]['name'].toLowerCase().includes(filter.toLowerCase())))) {
+          longNames[installed[gameId]['name']] = gameId;
+        }
       }
     });
   }

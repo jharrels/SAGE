@@ -74,6 +74,14 @@ button:hover {
   background-color:#0077ff;  
 }
 
+.search-container input {
+  padding-left: 35px;
+  background-color: #111;
+  color: white;
+  border: 1px solid #333;
+}
+
+
 .menuButton {
   background-color: rgba(27, 39, 45, 0.7);
   color: rgba(255,255,255,0.7);
