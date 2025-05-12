@@ -143,6 +143,35 @@ button:focus {
   margin-right: 5px;
 }
 
+.search-container {
+  position: relative;
+  display: inline-block;
+}
+
+.search-container input {
+  padding-left: 35px;
+  outline: none;
+  height: 24px;
+}
+
+.search-container::before {
+  content: "\f002";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: gray;
+}
+
+.searchField {
+  -webkit-app-region: none;
+  border-radius: 5px;
+  border: none;
+  height: 22px;
+}
+
 .menuButton {
   font-size: 20px;
   border-radius: 5px;

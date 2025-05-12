@@ -74,6 +74,13 @@ button:hover {
   background-color:#0077ff;  
 }
 
+.search-container input {
+  padding-left: 35px;
+  background-color: white;
+  color: black;
+  border: 1px solid #aaa;
+}
+
 .menuButton {
   background-color: #888;
   color: rgba(255,255,255,0.7);
@@ -154,7 +161,7 @@ button:hover {
 }
 
 .grid>div span {
-  color: #eee;
+  color: #333;
 }
 
 .list>div {
@@ -318,7 +325,7 @@ hr {
 Dialog
 ----------------------------------------*/
 .modal-body > hr {
-  border-top: 1px solid white;
+  border-top: 1px solid #333;
 }
 
 .modal > .modal-wrapper {
