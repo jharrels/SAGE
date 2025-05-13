@@ -52,9 +52,10 @@ var boxSize;
 /* ----------------------------------------------------------------------------
    HANDLE GUI EVENTS, SUCH AS CLICKING AND MOVING THE MOUSE
 ---------------------------------------------------------------------------- */
-$("#scummy-search").on("keyup", function () {
+$("#scummy-search").on("input", function () {
   filter = $("#scummy-search").val();
   drawGames();
+  drawCategories();
   clearTimeout(typingTimer); // Reset timer
   typingTimer = setTimeout(() => {
     $("#scummy-search").trigger("blur");
@@ -933,8 +934,10 @@ function drawCategories() {
     installedCategories[key] = {"count": 0, "installed": []};
   });
   Object.keys(installed).forEach(key => {
-    installedCategories[gameData[key]['category']]['count'] += 1;
-    installedCategories[gameData[key]['category']]['installed'].push(key);
+    if ((filter == "") || (installed[key]["name"].toLowerCase().includes(filter.toLowerCase()))) {
+      installedCategories[gameData[key]['category']]['count'] += 1;
+      installedCategories[gameData[key]['category']]['installed'].push(key);
+    }
   });
   Object.keys(categories).sort().forEach(key => {
     if (installedCategories[key]['count'] > 0) {
