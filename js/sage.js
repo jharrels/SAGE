@@ -1513,6 +1513,11 @@ function themeTitleBar(platform) {
     $("#minimize").html('<i class="fas fa-window-minimize"></i>'); // Font Awesome Minimize
     $("#maximize").html('<i class="far fa-window-maximize"></i>'); // Font Awesome Maximize
   }
+  if (platform == "darwin") {
+    $("#close").hide();
+    $("#minimize").hide();
+    $("#maximize").hide();
+  }
 }
 
 function switchTheme(themeId) {
