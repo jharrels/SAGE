@@ -1,0 +1,8 @@
+{
+    "name": "Dark",
+    "description": "A delightfully dark theme for SAGE.",
+    "version_required": {
+        "major": 1,
+        "minor": 2
+    }
+}

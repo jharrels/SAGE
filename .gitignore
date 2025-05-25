@@ -105,3 +105,4 @@ dist
 
 # Builds
 release-builds/
+CHANGELOG.md

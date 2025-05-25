@@ -1,18 +1,9 @@
-const { dialog } = require('electron').remote;
 const path = require('path');
 const os = require('os');
 const fs = require('fs')
-const { remote } = require('electron')
-const app = remote.app
-const { Menu, MenuItem } = remote
-const electron = require('electron');
+const { ipcRenderer } = require('electron')
 const { spawn } = require('child_process');
-const ini = require('ini');
-
-const electronScreen = require('electron').screen;
-const Store = require('electron-store');
-const store = new Store();
-const customTitlebar = require('custom-electron-titlebar');
+const platform = process.platform;
 
 var scummvmConfig = {};
 var scummyConfig = {};
@@ -23,14 +14,10 @@ var selectedGame = "";
 var selectedConfig = "";
 var importGamePath = "";
 var audioDevices = [];
+var filter = ""
+var typingTimer;
 
-//Menu.setApplicationMenu(null);
-
-let titlebar = new customTitlebar.Titlebar({
-  backgroundColor: customTitlebar.Color.fromHex('#1B262C'),
-  menu: null,
-  overflow: "hidden"
-});
+themeTitleBar(platform);
 
 const gridObserver = new MutationObserver(() => {
   $(".grid").css("grid-template-columns", `repeat(auto-fill, minmax(${ $("#box-size").val() }px, 1fr))`);
@@ -41,49 +28,73 @@ gridObserver.observe(document.body, { childList: true, subtree: true });
 /* ----------------------------------------------------------------------------
    LOAD PREFS AND SETUP THE GUI AT LAUNCH
 ---------------------------------------------------------------------------- */
-var listMode = store.get('listMode');
-if (listMode === undefined) listMode = "grid";
-var groupItems = store.get('groupItems');
-if (groupItems === undefined) groupItems = false;
-var favorites = store.get('favorites');
-if (favorites === undefined) favorites = [];
-var defaultVersion = store.get('defaultVersion');
-if (defaultVersion === undefined) defaultVersion = {};
-var selectedCategory = store.get('selectedCategory');
-if (selectedCategory === undefined) selectedCategory = "all";
-var recentList = store.get('recentList');
-if (recentList === undefined) recentList = [];
-var scummyConfig = store.get('scummyConfig');
-if (scummyConfig === undefined) scummyConfig = {};
-var boxSize = store.get('boxSize');
-if (boxSize === undefined) boxSize = 200;
+var listMode;
+var groupItems;
+var favorites;
+var defaultVersion;
+var selectedCategory;
+var recentList;
+var scummyConfig;
+var boxSize;
+(async () => {
+  await getAppSettings();
+  $(`#${listMode}-view`).addClass("active");
+  if (groupItems) $("#group-items").addClass("active");
+  $("#box-size").val(boxSize);
 
-// Migrate settings to 1.1.0+
-if (listMode == "gallery") {
-  listMode = "grid";
-  store.set('listMode', listMode);
-}
+  parseScummyConfig();
+  switchTheme(currentTheme);
+  installedThemes = getThemeNames();
+  checkInitState();  
+})();
 
-$(`#${listMode}-view`).addClass("active");
-if (groupItems) $("#group-items").addClass("active");
-$("#box-size").val(boxSize);
-
-parseScummyConfig();
-checkInitState();
 
 /* ----------------------------------------------------------------------------
    HANDLE GUI EVENTS, SUCH AS CLICKING AND MOVING THE MOUSE
 ---------------------------------------------------------------------------- */
+$("#scummy-search").on("input", function () {
+  filter = $("#scummy-search").val();
+  drawGames();
+  drawCategories();
+  clearTimeout(typingTimer); // Reset timer
+  typingTimer = setTimeout(() => {
+    $("#scummy-search").trigger("blur");
+  }, 15000);
+})
+
+$("#scummy-search").on("focus", function () {
+  clearTimeout(typingTimer); // Reset timer
+  typingTimer = setTimeout(() => {
+    $("#scummy-search").trigger("blur");
+  }, 15000);
+})
+
+$("#theme").on("change", function() {
+  let selectedTheme = $(this).val(); // Get selected theme
+  switchTheme(selectedTheme); // Apply theme dynamically
+});
+
+$("#close").on("click", function () {
+  ipcRenderer.send("window-action", "close");
+});
+
+$("#minimize").on("click", function () {
+  ipcRenderer.send("window-action", "minimize");
+});
+
+$("#maximize").on("click", function () {
+  ipcRenderer.send("window-action", "maximize");
+});
 
 $("#gui-show-title").on("click", () => {
   scummyConfig["showTitles"] = $("#gui-show-title").prop("checked");
-  store.set('scummyConfig', scummyConfig);
+  ipcRenderer.send('write-setting', 'scummyConfig', scummyConfig);
   drawGames();
 });
 
 $("#gui-show-favorite-icon").on("click", () => {
   scummyConfig["showFavoriteIcon"] = $("#gui-show-favorite-icon").prop("checked");
-  store.set('scummyConfig', scummyConfig);
+  ipcRenderer.send('write-setting', 'scummyConfig', scummyConfig);
   drawGames();
 });
 
@@ -111,12 +122,12 @@ $("#init-next-2").on("click", () => {
   $("#init-scummvm-config-path").html(tempPath);
 });
 
-$("#init-next-3").on("click", () => {
+$("#init-next-3").on("click",  async () => {
   hideModal("#scummy-init-modal-3");
   scummyConfig['scummvmConfigPath'] = $("#init-scummvm-config-path").text();
   scummyConfig['scummvmPath'] = $("#init-scummvm-executable-path").text();
-  store.set('scummyConfig', scummyConfig);
-  loadScummvmConfig();
+  ipcRenderer.send('write-setting', 'scummyConfig', scummyConfig);
+  await loadScummvmConfig();
   getInstalledGames();
   getAudioDevices();
   $(".sideBar").fadeIn(500, function() {
@@ -124,16 +135,17 @@ $("#init-next-3").on("click", () => {
   });
 });
 
-$("#change-scummvm-path").on("click", () => {
+$("#change-scummvm-path").on("click", async () => {
   $("#scummvm-executable-error").fadeOut(250);
-  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+  let tempPath = await ipcRenderer.invoke('show-dialog', {
       "title": "Locate the ScummVM executable",
       "message": "Locate the ScummVM executable.",
       "properties": [
         'openFile'
       ]
   })
-  if (tempPath) {
+  if (!tempPath.canceled) {
+    tempPath = tempPath['filePaths'][0];
     $("#scummvm-executable-path").html(tempPath);
     let launchOptions = ['--help'];
     let rawData = "";
@@ -164,16 +176,17 @@ $("#change-scummvm-path").on("click", () => {
   }
 });
 
-$("#change-scummvm-config-path").on("click", () => {
+$("#change-scummvm-config-path").on("click", async () => {
   $("#scummvm-config-error").fadeOut(250);
-  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+  let tempPath = await ipcRenderer.invoke('show-dialog', {
       "title": "Locate the ScummVM configuration file",
       "message": "Locate the ScummVM configuration file.",
       "properties": [
         'openFile'
       ]
   })
-  if (tempPath) {
+  if (!tempPath.canceled) {
+    tempPath = tempPath['filePaths'][0];
     $("#scummvm-configuration-path").html(tempPath);
     if (!verifyScummvmConfigurationFile(tempPath)) {
       $("#scummy-configure-modal-save").addClass("disabled-option");
@@ -182,16 +195,17 @@ $("#change-scummvm-config-path").on("click", () => {
   }
 });
 
-$("#init-scummvm-path").on("click", () => {
+$("#init-scummvm-path").on("click", async () => {
   $("#init-scummvm-executable-error").fadeOut(250);
-  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+  let tempPath = await ipcRenderer.invoke('show-dialog', {
       "title": "Locate the ScummVM executable",
       "message": "Locate the ScummVM executable.",
       "properties": [
         'openFile'
       ]
   })
-  if (tempPath) {
+  if (!tempPath.canceled) {
+    tempPath = tempPath['filePaths'][0];
     $("#init-scummvm-executable-path").html(tempPath);
     let launchOptions = ['--help'];
     let rawData = "";
@@ -223,16 +237,17 @@ $("#init-scummvm-path").on("click", () => {
   }
 });
 
-$("#init-choose-scummvm-config-path").on("click", () => {
+$("#init-choose-scummvm-config-path").on("click", async () => {
   $("#init-scummvm-config-error").fadeOut(250);
-  let tempPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+  let tempPath = await ipcRenderer.invoke('show-dialog', {
       "title": "Locate the ScummVM Configuration File",
       "message": "Locate the ScummVM Configuration File.",
       "properties": [
         'openFile'
       ]
   })
-  if (tempPath) {
+  if (!tempPath.canceled) {
+    tempPath = tempPath['filePaths'][0];
     $("#init-scummvm-config-path").html(tempPath);
     if (!verifyScummvmConfigurationFile(tempPath)) {
       $("#init-next-3").addClass("disabled-option");
@@ -243,17 +258,19 @@ $("#init-choose-scummvm-config-path").on("click", () => {
   }
 });
 
-$("#add-game").on("click", () => {
-  let addPath = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+$("#add-game").on("click", async () => {
+  $("#add-game").addClass("active");
+  let addPath = await ipcRenderer.invoke('show-dialog', {
       "title": "Add Game",
       "message": "Choose the directory containing the game to add.",
       "properties": [
         'openDirectory'
       ]
   })
-  if (addPath) {
-    detectGame(addPath[0]);
+  if (!addPath.canceled) {
+    detectGame(addPath['filePaths'][0]);
   }
+  $("#add-game").removeClass("active");
 });
 
 $("#grid-view").on("click", () => {
@@ -261,7 +278,7 @@ $("#grid-view").on("click", () => {
     $("#list-view").removeClass("active");
     $("#grid-view").addClass("active");
     listMode = "grid";
-    store.set('listMode', listMode);
+    ipcRenderer.send('write-setting', 'listMode', listMode);
     drawGames();
   }
 });
@@ -271,7 +288,7 @@ $("#list-view").on("click", () => {
     $("#grid-view").removeClass("active");
     $("#list-view").addClass("active");
     listMode = "list";
-    store.set('listMode', listMode);
+    ipcRenderer.send('write-setting', 'listMode', listMode);
     drawGames();
   }
 });
@@ -280,12 +297,12 @@ $("#group-items").on("click", () => {
   if (!$("#group-items").hasClass("active")) {
     $("#group-items").addClass("active");
     groupItems = true;
-    store.set('groupItems', groupItems);
+    ipcRenderer.send('write-setting', 'groupItems', groupItems);
     drawGames();
   } else {
     $("#group-items").removeClass("active");
     groupItems = false;
-    store.set('groupItems', groupItems);
+    ipcRenderer.send('write-setting', 'groupItems', groupItems);
     drawGames();
   }
 });
@@ -300,7 +317,7 @@ $(".launch-config").on("click", ".default", function(e) {
   let configName = $(this).parent().data("version");
   selectedConfig = configName;
   defaultVersion[selectedGame] = configName;
-  store.set('defaultVersion', defaultVersion);
+  ipcRenderer.send('write-setting', 'defaultVersion', defaultVersion);
   drawGameInfo(selectedGame);
 });
 
@@ -343,7 +360,7 @@ $(".game-info-boxart").on("click", ".game-info-favorite", function(e) {
     favorites.push(selectedGame);
     $(`#${selectedGame}`).find("span").prepend("<i class='fas fa-heart fa-fw favorite-pink'></i>");
   }
-  store.set('favorites', favorites);
+  ipcRenderer.send('write-setting', 'favorites', favorites);
   $("#favorites").html(favorites.length);
 });
 
@@ -381,7 +398,7 @@ $(".sideBar").on("click", ".sideBarItem", function(e) {
   $(".sideBarItem").removeClass("selected");
   $(this).addClass("selected");
   selectedCategory = $(this).attr("id").split("-")[1];
-  store.set('selectedCategory', selectedCategory);
+  ipcRenderer.send('write-setting', 'selectedCategory', selectedCategory);
   drawGames();
 });
 
@@ -391,11 +408,11 @@ $("#scummy-view-options").on("click", function() {
     $("#gui-show-favorite-icon").prop("checked", scummyConfig['showFavoriteIcon']);
     $("#view-menu").addClass("view-menu-visible");
     let buttonIcon = $("<i></i>", {"class": "fas fa-chevron-left fa-fw"});
-    $("#scummy-view-options").html(buttonIcon);
+    $("#scummy-view-options").addClass("active");
   } else {
     $("#view-menu").removeClass("view-menu-visible");
     let buttonIcon = $("<i></i>", {"class": "fas fa-chevron-right fa-fw"});
-    $("#scummy-view-options").html(buttonIcon);    
+    $("#scummy-view-options").removeClass("active");
   }
 });
 
@@ -403,12 +420,14 @@ $("#box-size").on("input", function() {
   let minSize = $(this).val();
   animateGridSize(boxSize, minSize);
   boxSize = minSize;
-  store.set('boxSize', minSize);
+  ipcRenderer.send('write-setting', 'boxSize', minSize);
   $(".grid").css("grid-template-columns", `repeat(auto-fill, minmax(${minSize}px, 1fr))`);
 });
 
 $("#scummy-configure").on("click", function() {
+  $("#scummy-configure").addClass("active");
   showModal("#scummy-configure-modal");
+  populateThemeDropdown(installedThemes, currentTheme);
   $("#scummvm-executable-error").hide();
   $("#scummvm-config-error").hide();
   $("#scummvm-executable-path").html(scummyConfig['scummvmPath']);
@@ -453,7 +472,7 @@ $("#context-menu").on("click", ".favorite", function(e) {
     favorites.push(selectedGame);
     $(`#${selectedGame}`).find("span").prepend("<i class='fas fa-heart fa-fw favorite-pink'></i>");
   }
-  store.set('favorites', favorites);
+  ipcRenderer.send('write-setting', 'favorites', favorites);
   $("#favorites").html(favorites.length);
   $("#context-menu").fadeOut(250);
 });
@@ -575,7 +594,8 @@ $("#unknown-modal-close").on("click", () => {
 });
 
 $("#game-info-close").on("click", () => {
-  $("#game-info").fadeOut(250);
+  $("#game-info-modal").fadeOut(250);
+  drawGames();
 });
 
 $("#game-configure-modal-cancel").on("click", () => {
@@ -585,24 +605,27 @@ $("#game-configure-modal-cancel").on("click", () => {
 
 $("#scummy-configure-modal-cancel").on("click", () => {
   $("#scummy-configure-modal").fadeOut(250);
+  $("#scummy-configure").removeClass("active");
 });
 
 $("#scummy-configure-modal-save").on("click", () => {
   saveScummyConfig();
   $("#scummy-configure-modal").fadeOut(250);
+  $("#scummy-configure").removeClass("active");
 });
 
 
-$("#game-configure-modal-save").on("click", () => {
+$("#game-configure-modal-save").on("click", async () => {
   let shortName = selectedConfig;
   enableDisableGraphicsOptions(shortName);
   enableDisableAudioOptions(shortName);
   enableDisableVolumeOptions(shortName);
   scummvmConfig = JSON.parse(JSON.stringify(tempConfig));
-  fs.writeFileSync(scummyConfig['scummvmConfigPath'], ini.stringify(scummvmConfig));
+  await ipcRenderer.invoke('write-ini-config', 
+    scummyConfig['scummvmConfigPath'],
+    scummvmConfig);
   $("#game-configure-modal").fadeOut(250);
 });
-
 
 /* ----------------------------------------------------------------------------
    FUNCTIONS
@@ -728,18 +751,25 @@ function volumeOverridden(gameShortName) {
 }
 
 function launchGame(gameId, shortName) {
+  console.log(installed);
+  console.log(shortName);
+  console.log(installed[gameId]["versions"][shortName]);
   let lastPosition = recentList.indexOf(gameId);
   if (lastPosition > -1) recentList.splice(lastPosition, 1);
   recentList.unshift(gameId);
   recentList.splice(scummyConfig['recentMax']);
-  store.set('recentList', recentList);
+  ipcRenderer.send('write-setting', 'recentList', recentList);
   if (selectedCategory == "recent") drawGames();
   let launchOptions = [];
-  let installPath = scummvmConfig[shortName]['path'].split("\\").join("\\\\");
-  let tempConfigPath = writeTempConfig(shortName);
-  launchOptions.push(`--config="${tempConfigPath}"`);
+  for (let i=0; i<installed[gameId]["versions"].length; i++) {
+    if (shortName == installed[gameId]["versions"][i]["versionShortName"]) {
+      const cleanPath = installed[gameId]["versions"][i]["path"].replace(/[\\/]$/, "");
+      launchOptions.push("-p");
+      launchOptions.push(`"${cleanPath}"`);
+    }
+  }
   launchOptions.push(gameId);
-  let rawData = "";
+  console.log(launchOptions);
   let scummvmFile = path.basename(scummyConfig['scummvmPath']);
   let scummvmPath = path.dirname(scummyConfig['scummvmPath']);
   if (os.type() == 'Darwin') {
@@ -752,6 +782,7 @@ function launchGame(gameId, shortName) {
   });
 
   scummvm.stderr.on('data', (data) => {
+    console.log(data);
   });
 
   scummvm.on('exit', (code) => {
@@ -903,8 +934,10 @@ function drawCategories() {
     installedCategories[key] = {"count": 0, "installed": []};
   });
   Object.keys(installed).forEach(key => {
-    installedCategories[gameData[key]['category']]['count'] += 1;
-    installedCategories[gameData[key]['category']]['installed'].push(key);
+    if ((filter == "") || (installed[key]["name"].toLowerCase().includes(filter.toLowerCase()))) {
+      installedCategories[gameData[key]['category']]['count'] += 1;
+      installedCategories[gameData[key]['category']]['installed'].push(key);
+    }
   });
   Object.keys(categories).sort().forEach(key => {
     if (installedCategories[key]['count'] > 0) {
@@ -969,32 +1002,54 @@ function drawGameInfo(gameId) {
 
   }
   $("#context-menu").fadeOut(250);
-  $("#game-info").fadeIn(250);
+  $("#game-info-modal").fadeIn(250);
 }
 
 function drawGames() {
   $(".grid").remove();
   $(".list").remove();
-  $(".main").html("")
+  $(".main").html("");
   if (groupItems) {
     if (selectedCategory == "all") {
       let listId = 1;
-      Object.keys(categories).sort().forEach(key => {
-        if (installedCategories[key]['count'] > 0) {
-          let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
-          if (listId == 1) groupHeader.addClass("first");
-          $(".main").append(groupHeader);
-          listId = drawGameList(installedCategories[key]['installed'], listId);
-        }
-      });
+      if (filter != "") {
+        Object.keys(categories).sort().forEach(key => {
+          let filteredItemsInCategory = 0;
+          for (let i=0; i<installedCategories[key]['installed'].length; i++) {
+            let gameId = installedCategories[key]['installed'][i];
+            if (installed[gameId]['name'].toLowerCase().includes(filter.toLowerCase())) {
+              filteredItemsInCategory++;
+            }
+          }
+          if ((installedCategories[key]['count'] > 0) && (filteredItemsInCategory > 0)) {
+            let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
+            if (listId == 1) groupHeader.addClass("first");
+            $(".main").append(groupHeader);
+            listId = drawGameList(installedCategories[key]['installed'], listId);
+          }
+        });
+      } else {
+        Object.keys(categories).sort().forEach(key => {
+          if (installedCategories[key]['count'] > 0) {
+            let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
+            if (listId == 1) groupHeader.addClass("first");
+            $(".main").append(groupHeader);
+            listId = drawGameList(installedCategories[key]['installed'], listId);
+          }
+        });
+      }
     }
     if (selectedCategory == "favorites") {
       let listId = 1;
       favoriteCategories = {};
       for (i=0; i<favorites.length; i++) {
+        let addKey = false;
+        if ((filter == "") || ((filter != "") && (installed[favorites[i]]["name"].toLowerCase().includes(filter.toLowerCase())))) addKey = true;
         categoryKey = gameData[favorites[i]]['category'];
-        if (!(categoryKey in favoriteCategories)) favoriteCategories[categoryKey] = [];
-        favoriteCategories[categoryKey].push(favorites[i]);
+        if (addKey) {
+          if (!(categoryKey in favoriteCategories)) favoriteCategories[categoryKey] = [];
+          favoriteCategories[categoryKey].push(favorites[i]);
+        }
       }
       Object.keys(favoriteCategories).sort().forEach(key => {
         let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[key]);
@@ -1006,11 +1061,23 @@ function drawGames() {
     if (selectedCategory == "recent") {
       let listId = 1;
       recentCategories = {};
-      for (i=0; i<recentList.length; i++) {
-        if (recentList[i] in installed) {
-          categoryKey = gameData[recentList[i]]['category'];
-          if (!(categoryKey in recentCategories)) recentCategories[categoryKey] = [];
-          recentCategories[categoryKey].push(recentList[i]);
+      if (filter == "") {
+        for (i=0; i<recentList.length; i++) {
+          if (recentList[i] in installed) {
+            categoryKey = gameData[recentList[i]]['category'];
+            let filteredGamesInCategory = false;
+            if (!(categoryKey in recentCategories)) recentCategories[categoryKey] = [];
+            recentCategories[categoryKey].push(recentList[i]);
+          }
+        }
+      } else {
+        for (i=0; i<recentList.length; i++) {
+          if ((recentList[i] in installed) && (installed[recentList[i]]['name'].toLowerCase().includes(filter.toLowerCase()))) {
+            categoryKey = gameData[recentList[i]]['category'];
+            let filteredGamesInCategory = false;
+            if (!(categoryKey in recentCategories)) recentCategories[categoryKey] = [];
+            recentCategories[categoryKey].push(recentList[i]);
+          }
         }
       }
       Object.keys(recentCategories).sort().forEach(key => {
@@ -1021,10 +1088,18 @@ function drawGames() {
       });
     } 
     if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
+      console.log("yo");
       listId = 1;
       let categoryList = {};
       Object.keys(installed).forEach(key => {
-        if (selectedCategory == gameData[key]['category']) categoryList[installed[key]['name']] = key;
+        if (filter == "") {
+          if (selectedCategory == gameData[key]['category']) categoryList[installed[key]['name']] = key;
+        } else {
+          if ((selectedCategory == gameData[key]['category']) && (installed[key]['name'].toLowerCase().includes(filter.toLowerCase()))) {
+            console.log("yo");
+            categoryList[installed[key]['name']] = key;
+          }
+        }
       });
       let groupHeader = $("<div></div>", {"class": "group-header"}).text(categories[selectedCategory]);
       if (listId == 1) groupHeader.addClass("first");
@@ -1035,7 +1110,14 @@ function drawGames() {
     if ((selectedCategory != "favorites") && (selectedCategory != "all") && (selectedCategory != "recent")) {
       let categoryList = {};
       Object.keys(installed).forEach(key => {
-        if (selectedCategory == gameData[key]['category']) categoryList[installed[key]['name']] = key;
+        if (filter == "") {
+          if (selectedCategory == gameData[key]['category']) categoryList[installed[key]['name']] = key;
+        } else {
+          if ((selectedCategory == gameData[key]['category']) && (installed[key]['name'].toLowerCase().includes(filter.toLowerCase()))) {
+            console.log("yo");
+            categoryList[installed[key]['name']] = key;
+          }
+        }
       });
       listId = drawGameList(categoryList);
     } else {
@@ -1043,27 +1125,47 @@ function drawGames() {
     }
     
   }
-  
 }
 
 function drawGameList(gameList, listId=1) {
   let longNames = {};
   if (selectedCategory == "recent") {
     recentList.forEach(key => {
-      if (gameList.includes(key)) {
-        longNames[installed[key]['name']] = key;
+      if (filter == "") {
+        if (gameList.includes(key)) {
+          longNames[installed[key]['name']] = key;
+        }
+      } else {
+        if ((gameList.includes(key) && (installed[key]['name'].toLowerCase().includes(filter.toLowerCase())))) {
+          longNames[installed[key]['name']] = key;
+        }
       }
     });
   }
   if (selectedCategory == "all") {
-    gameList.forEach(gameId => {
-      longNames[installed[gameId]['name']] = gameId;
-    });
+    if (filter != "") {
+      gameList.forEach(gameId => {
+        if (installed[gameId]['name'].toLowerCase().includes(filter.toLowerCase())) {
+          longNames[installed[gameId]['name']] = gameId;
+        }  
+      });
+    } else {
+      gameList.forEach(gameId => {
+        longNames[installed[gameId]['name']] = gameId;
+      });
+
+    }
   }
   if (selectedCategory == "favorites") {
     favorites.forEach(gameId => {
-      if (gameList.includes(gameId)) {
-        longNames[installed[gameId]['name']] = gameId;
+      if (filter == "") {
+        if (gameList.includes(gameId)) {
+          longNames[installed[gameId]['name']] = gameId;
+        }
+      } else {
+        if ((gameList.includes(gameId) && (installed[gameId]['name'].toLowerCase().includes(filter.toLowerCase())))) {
+          longNames[installed[gameId]['name']] = gameId;
+        }
       }
     });
   }
@@ -1105,12 +1207,13 @@ function getInstalledGames() {
       let gameName = scummvmConfig[key]['description'].replace(/\s\([^()]*\)$/, '');
       let versionText = scummvmConfig[key]['description'].replace(/.*\(([^()]+)\)$/, '$1');
       let gameId = scummvmConfig[key]['engineid']+":"+scummvmConfig[key]['gameid'];
+      let gamePath = scummvmConfig[key]['path'];
       if (gameId in installed) {
-        installed[gameId]['versions'].push({"version": versionText, "versionShortName": key});
+        installed[gameId]['versions'].push({"version": versionText, "versionShortName": key, "path": gamePath});
       } else {
         if (gameName.substr(0, 4) == "The ") gameName = gameName.substr(4) + ", The";
         installed[gameId] = {"name": gameName, "versions": []};
-        installed[gameId]['versions'].push({"version": versionText, "versionShortName": key});
+        installed[gameId]['versions'].push({"version": versionText, "versionShortName": key, "path": gamePath});
       }
     }
   }
@@ -1131,7 +1234,7 @@ function updateDefaultVersions() {
       defaultVersion[key] = installed[key]['versions'][0]['versionShortName'];
     }
   });
-  store.set('defaultVersion', defaultVersion);
+  ipcRenderer.send('write-setting', 'defaultVersion', defaultVersion);
 }
 
 function getScummvmConfigPath() {
@@ -1142,9 +1245,8 @@ function getScummvmConfigPath() {
   return scummvmConfigPath;
 }
 
-function loadScummvmConfig() {
-  let rawScummvmConfig = fs.readFileSync(scummyConfig['scummvmConfigPath'], 'utf-8');
-  scummvmConfig = ini.parse(rawScummvmConfig);
+async function loadScummvmConfig() {
+  scummvmConfig = await ipcRenderer.invoke('read-ini-config', scummyConfig['scummvmConfigPath']);
 }
 
 function showWaiting(gameName) {
@@ -1160,23 +1262,6 @@ function hideWaiting() {
   $(".waiting").fadeOut(500, () => {
     $(".waiting").remove();
   });
-}
-
-function writeTempConfig(shortName) {
-    let tempConfig = [];
-    let lineEnd;
-    if (os.type() == 'Windows_NT') tempConfigPath = process.env.APPDATA+"\\Scummy\\temp.ini";
-    if (os.type() == 'Darwin') tempConfigPath = process.env.HOME+"/Library/Preferences/Scummy";
-    if (os.type() == 'Linux') tempConfigPath = app.getPath(userData);
-    tempConfig.push("[scummvm]");
-    Object.keys(scummvmConfig['scummvm']).forEach(key => {
-      tempConfig.push(`${key}=${scummvmConfig['scummvm'][key]}`);
-    });
-    Object.keys(scummvmConfig[shortName]).forEach(key => {
-      tempConfig.push(`${key}=${scummvmConfig[shortName][key]}`);
-    });
-    fs.writeFileSync(tempConfigPath, tempConfig.join("\n"), {encoding: "utf8"});
-    return tempConfigPath;
 }
 
 function detectGame(gamePath) {
@@ -1257,6 +1342,7 @@ function detectGame(gamePath) {
   })
 }
 
+
 function importGame(gamePath) {
   let launchOptions = ['--add', `--path="${gamePath}"`];
   let rawData = "";
@@ -1275,10 +1361,14 @@ function importGame(gamePath) {
   });
 
   scummvm.on('exit', (code) => {
-    loadScummvmConfig();
-    getInstalledGames();
-    drawGames();
+    afterImportGame();
   })
+}
+
+async function afterImportGame() {
+  await loadScummvmConfig();
+  getInstalledGames();
+  drawGames();
 }
 
 function getAudioDevices() {
@@ -1313,9 +1403,11 @@ function getAudioDevices() {
   })
 }
 
-function removeGame(configName) {
+async function removeGame(configName) {
   delete scummvmConfig[configName];
-  fs.writeFileSync(scummyConfig['scummvmConfigPath'], ini.stringify(scummvmConfig));
+  await ipcRenderer.invoke('write-ini-config', 
+                           scummyConfig['scummvmConfigPath'],
+                           scummvmConfig);
   getInstalledGames();
   drawGames();
   $("#game-info-close").trigger("click");
@@ -1332,14 +1424,12 @@ function parseScummyConfig() {
 }
 
 function saveScummyConfig() {
-  scummyConfig["showTitles"] = $("#gui-show-title").prop("checked");
-  scummyConfig["showFavoriteIcon"] = $("#gui-show-favorite-icon").prop("checked");
   scummyConfig["showCategories"] = $("#gui-show-categories").prop("checked");
   scummyConfig["showRecentCategory"] = $("#gui-show-recents").prop("checked");
   scummyConfig["recentMax"] = $("#gui-max-recents").val();
   scummyConfig["scummvmPath"] = $("#scummvm-executable-path").text();
   scummyConfig["scummvmConfigPath"] = $("#scummvm-configuration-path").text();
-  store.set('scummyConfig', scummyConfig);
+  ipcRenderer.send('write-setting', 'scummyConfig', scummyConfig);
   if (scummyConfig["showCategories"]) {
     $("#sideBarCategories").fadeIn(250);
   } else {
@@ -1359,7 +1449,7 @@ function showScummySetup() {
   showModal("#scummy-init-modal-1");
 }
 
-function checkInitState() {
+async function checkInitState() {
   if (scummyConfig['scummvmPath'] == "") {
     $(".sideBar").hide();
     $(".main").hide();
@@ -1367,15 +1457,14 @@ function checkInitState() {
     $(".rightMenuBar").hide();
     showScummySetup();
   } else {
-    loadScummvmConfig();
+    await loadScummvmConfig();
     getInstalledGames();
     getAudioDevices();
   }
 }
 
-function verifyScummvmConfigurationFile(configPath) {
-  let rawScummvmConfig = fs.readFileSync(configPath.toString(), 'utf-8');
-  let testScummvmConfig = ini.parse(rawScummvmConfig);
+async function verifyScummvmConfigurationFile(configPath) {
+  let testScummvmConfig = await ipcRenderer.invoke('read-ini-config', configPath);
   return (testScummvmConfig.hasOwnProperty("scummvm"));
 }
 
@@ -1385,4 +1474,88 @@ function showModal(modalId) {
 
 function hideModal(modalId) {
   $(modalId).fadeOut(250);
+}
+
+async function getAppSettings() {
+  listMode = await ipcRenderer.invoke('read-setting', 'listMode');
+  if (listMode === undefined) listMode = "grid";
+  groupItems = await ipcRenderer.invoke('read-setting', 'groupItems');
+  if (groupItems === undefined) groupItems = false;
+  favorites = await ipcRenderer.invoke('read-setting', 'favorites');
+  if (favorites === undefined) favorites = [];
+  defaultVersion = await ipcRenderer.invoke('read-setting', 'defaultVersion');
+  if (defaultVersion === undefined) defaultVersion = {};
+  selectedCategory = await ipcRenderer.invoke('read-setting', 'selectedCategory');
+  if (selectedCategory === undefined) selectedCategory = "all";
+  recentList = await ipcRenderer.invoke('read-setting', 'recentList');
+  if (recentList === undefined) recentList = [];
+  scummyConfig = await ipcRenderer.invoke('read-setting', 'scummyConfig');
+  if (scummyConfig === undefined) scummyConfig = {};
+  boxSize = await ipcRenderer.invoke('read-setting', 'boxSize');
+  if (boxSize === undefined) boxSize = 200;
+  currentTheme = await ipcRenderer.invoke('read-setting', 'currentTheme');
+  if (currentTheme === undefined) currentTheme = "sage";
+
+  // Migrate settings to 1.1.0+
+  if (listMode == "gallery") {
+    listMode = "grid";
+    ipcRenderer.send('write-setting', 'listMode', listMode);
+  }
+}
+
+function themeTitleBar(platform) {
+  if (platform.includes("win")) {
+    $("#close").html("&#xE8BB;"); // Segoe MDL2 Close
+    $("#minimize").html("&#xE921;"); // Segoe MDL2 Minimize
+    $("#maximize").html("&#xE922;"); // Segoe MDL2 Maximize
+  } else {
+    $("#close").html('<i class="fas fa-times"></i>'); // Font Awesome Close
+    $("#minimize").html('<i class="fas fa-window-minimize"></i>'); // Font Awesome Minimize
+    $("#maximize").html('<i class="far fa-window-maximize"></i>'); // Font Awesome Maximize
+  }
+  if (platform == "darwin") {
+    $("#close").hide();
+    $("#minimize").hide();
+    $("#maximize").hide();
+  }
+}
+
+function switchTheme(themeId) {
+  $("link[rel=stylesheet][data-theme]").remove();
+  $("<link>", {
+    rel: "stylesheet",
+    type: "text/css",
+    href: `themes/${themeId}/${themeId}.css`, 
+    "data-theme": "true" 
+  }).appendTo("head");
+  ipcRenderer.send('write-setting', 'currentTheme', themeId);
+  currentTheme = themeId;
+}
+
+function getThemeNames() {
+  const themesDir = path.join(__dirname, "themes");
+  let themes = [];
+
+  fs.readdirSync(themesDir).forEach((dir) => {
+    const infoPath = path.join(themesDir, dir, "info.json");
+
+    if (fs.existsSync(infoPath)) {
+      const data = JSON.parse(fs.readFileSync(infoPath, "utf8"));
+      themes.push({ displayName: data.name, folderName: dir });
+    }
+  });
+
+  return themes.sort((a, b) => a.displayName.localeCompare(b.displayName));
+}
+
+function populateThemeDropdown(themes, currentTheme) {
+  $("#theme").empty();
+  themes.forEach((theme) => {
+    let $option = $("<option>", {
+      value: theme.folderName, 
+      text: theme.displayName,
+      selected: theme.folderName === currentTheme,
+    });
+    $("#theme").append($option);
+  });
 }
