@@ -26,9 +26,12 @@ fs.readdirSync(buildPath).forEach((folder) => {
 
   // Apply renaming rules: Replace platform architecture labels
   let newName = folder
+    .replace("darwin", "mac")
     .replace("win32", "windows")
     .replace("ia32", "32bit")
-    .replace("x64", "64bit");
+    .replace("x64", "64bit")
+    .replace("mac-64bit", "mac-intel")
+    .replace("mac-arm64", "mac-apple-silicon");
 
   const newPath = path.join(buildPath, `${newName}-${version}`);
 
